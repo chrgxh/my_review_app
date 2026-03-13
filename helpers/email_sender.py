@@ -7,7 +7,8 @@ async def send_email_with_resend(
     from_email: str,
     to_email: str,
     subject: str,
-    html: str
+    html: str,
+    reply_to_email: str | None = None,
 ) -> dict:
     url = "https://api.resend.com/emails"
 
@@ -23,13 +24,15 @@ async def send_email_with_resend(
         "html": html,
     }
 
+    if reply_to_email:
+        payload["reply_to"] = reply_to_email
+
     logger.info(f"Sending email to {to_email} via Resend")
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.post(url, headers=headers, json=payload)
 
     logger.info(f"Resend response status: {response.status_code}")
-
     response.raise_for_status()
 
     data = response.json()

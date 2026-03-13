@@ -1,15 +1,27 @@
 import os
 import httpx
+import secrets
 from dotenv import load_dotenv
 from loguru import logger
+
+from sqlmodel import Session, select
+
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
 from contextlib import asynccontextmanager
+
+from models.business import Business
+from models.business_user import BusinessUser
+from models.feedback_request import FeedbackRequest
+
 from helpers.email_renderer import render_feedback_email_html
 from helpers.email_sender import send_email_with_resend
-from helpers.db import create_db_and_tables
+from helpers.db import create_db_and_tables, engine
+
+from repositories.feedback_requests import create_feedback_request
 
 load_dotenv()
 
@@ -69,50 +81,78 @@ async def request_feedback(
 ):
     logger.info(f"Preparing feedback request for {recipientEmail}")
 
-    feedback_url = f"{BASE_URL}/feedback/test"
+    with Session(engine) as session:
+        business = session.exec(select(Business).order_by(Business.id)).first()
+        user = session.exec(select(BusinessUser).order_by(BusinessUser.id)).first()
 
-    html = render_feedback_email_html(
-        recipient_email=recipientEmail,
-        identifier=identifier,
-        message=message,
-        feedback_url=feedback_url,
-    )
+        if business is None or user is None:
+            return templates.TemplateResponse(
+                "admin.html",
+                {
+                    "request": request,
+                    "error_message": "No business or business user found. Run the seed script first.",
+                },
+            )
 
-    try:
-        await send_email_with_resend(
-            resend_api_key=RESEND_API_KEY,
-            from_email=FROM_EMAIL,
-            to_email=recipientEmail,
-            subject="We’d love your feedback",
-            html=html,
+        token = secrets.token_urlsafe(24)
+        feedback_url = f"{BASE_URL}/feedback/{token}"
+
+        final_message = message.strip() if message.strip() else (business.default_email_text or "")
+
+        html = render_feedback_email_html(
+            recipient_email=recipientEmail,
+            identifier=identifier,
+            message=final_message,
+            feedback_url=feedback_url,
         )
 
-        return templates.TemplateResponse(
-            "admin.html",
-            {
-                "request": request,
-                "success_message": f"Feedback request sent to {recipientEmail}",
-            },
-        )
+        try:
+            resend_data = await send_email_with_resend(
+                resend_api_key=RESEND_API_KEY,
+                from_email=business.from_email,
+                to_email=recipientEmail,
+                subject="We’d love your feedback",
+                html=html,
+                reply_to_email=business.reply_to_email,
+            )
 
-    except httpx.HTTPStatusError as exc:
-        logger.error(f"Resend rejected the request: {exc.response.text}")
+            create_feedback_request(
+                session=session,
+                business_id=business.id,
+                sent_by_user_id=user.id,
+                recipient_email=recipientEmail,
+                identifier=identifier,
+                message=final_message or None,
+                token=token,
+                email_provider_id=resend_data.get("id"),
+            )
 
-        return templates.TemplateResponse(
-            "admin.html",
-            {
-                "request": request,
-                "error_message": "Email could not be sent. Please check the recipient address or your Resend configuration.",
-            },
-        )
+            return templates.TemplateResponse(
+                "admin.html",
+                {
+                    "request": request,
+                    "success_message": f"Feedback request sent to {recipientEmail}",
+                },
+            )
 
-    except Exception as exc:
-        logger.exception(f"Unexpected error while sending email: {exc}")
+        except httpx.HTTPStatusError as exc:
+            logger.error(f"Resend rejected the request: {exc.response.text}")
 
-        return templates.TemplateResponse(
-            "admin.html",
-            {
-                "request": request,
-                "error_message": "Something went wrong while sending the email.",
-            },
-        )
+            return templates.TemplateResponse(
+                "admin.html",
+                {
+                    "request": request,
+                    "error_message": "Email could not be sent. Please check the recipient address or your Resend configuration.",
+                },
+            )
+
+        except Exception as exc:
+            logger.exception(f"Unexpected error while sending email: {exc}")
+
+            return templates.TemplateResponse(
+                "admin.html",
+                {
+                    "request": request,
+                    "error_message": "Something went wrong while sending the email.",
+                },
+            )
