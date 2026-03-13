@@ -6,3 +6,5 @@ httpx
 python-multipart
 python-dotenv
 loguru
+pwdlib[argon2]
+pyyaml

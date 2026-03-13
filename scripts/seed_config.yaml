@@ -1,0 +1,14 @@
+business:
+  name: Demo Business
+  slug: demo-business
+  from_email: onboarding@resend.dev
+  reply_to_email: null
+  logo_url: null
+  default_email_text: "Thank you for your time. We would love to hear your feedback."
+  review_redirect_url: null
+  subscription_days: 365
+
+user:
+  email: admin@example.com
+  password: changeme123
+  full_name: Demo Admin
