@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# Environment variables
+.env
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# VSCode
+.vscode/
+
+# Mac
+.DS_Store
+
+# Linux
+*.swp
+
+# Pytest (if you add tests later)
+.pytest_cache/
+
+# Mypy / type checking
+.mypy_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Jupyter
+.ipynb_checkpoints/
