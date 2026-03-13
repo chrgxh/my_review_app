@@ -211,3 +211,13 @@ button:active {
     color: #24543a;
     font-size: 0.96rem;
 }
+
+.error-message {
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    border: 1px solid #e2b8b8;
+    border-radius: 10px;
+    background: #fbeeee;
+    color: #7a2e2e;
+    font-size: 0.96rem;
+}

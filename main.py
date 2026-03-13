@@ -1,4 +1,5 @@
 import os
+import httpx
 from dotenv import load_dotenv
 from loguru import logger
 from fastapi import FastAPI, Request, Form
@@ -69,18 +70,41 @@ async def request_feedback(
         feedback_url=feedback_url,
     )
 
-    await send_email_with_resend(
-        resend_api_key=RESEND_API_KEY,
-        from_email=FROM_EMAIL,
-        to_email=recipientEmail,
-        subject="We’d love your feedback",
-        html=html,
-    )
+    try:
+        await send_email_with_resend(
+            resend_api_key=RESEND_API_KEY,
+            from_email=FROM_EMAIL,
+            to_email=recipientEmail,
+            subject="We’d love your feedback",
+            html=html,
+        )
 
-    return templates.TemplateResponse(
-        "admin.html",
-        {
-            "request": request,
-            "success_message": f"Feedback request sent to {recipientEmail}",
-        }
-    )
+        return templates.TemplateResponse(
+            "admin.html",
+            {
+                "request": request,
+                "success_message": f"Feedback request sent to {recipientEmail}",
+            },
+        )
+
+    except httpx.HTTPStatusError as exc:
+        logger.error(f"Resend rejected the request: {exc.response.text}")
+
+        return templates.TemplateResponse(
+            "admin.html",
+            {
+                "request": request,
+                "error_message": "Email could not be sent. Please check the recipient address or your Resend configuration.",
+            },
+        )
+
+    except Exception as exc:
+        logger.exception(f"Unexpected error while sending email: {exc}")
+
+        return templates.TemplateResponse(
+            "admin.html",
+            {
+                "request": request,
+                "error_message": "Something went wrong while sending the email.",
+            },
+        )
