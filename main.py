@@ -6,8 +6,10 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from contextlib import asynccontextmanager
 from helpers.email_renderer import render_feedback_email_html
 from helpers.email_sender import send_email_with_resend
+from helpers.db import create_db_and_tables
 
 load_dotenv()
 
@@ -20,7 +22,13 @@ logger.info(f"RESEND_API_KEY loaded: {RESEND_API_KEY is not None}")
 logger.info(f"FROM_EMAIL: {FROM_EMAIL}")
 logger.info(f"BASE_URL: {BASE_URL}")
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    logger.info("Database tables ready")
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 templates = Jinja2Templates(directory="templates")
 
