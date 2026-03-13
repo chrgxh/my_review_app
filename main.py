@@ -48,10 +48,29 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)
-async def admin_page(request: Request):
+async def admin_page(
+    request: Request,
+    status: str | None = None,
+):
+    success_message = None
+    error_message = None
+
+    if status == "success":
+        success_message = "Feedback request sent successfully."
+
+    elif status == "mail_error":
+        error_message = "Email could not be sent. Please check the recipient address or email configuration."
+
+    elif status == "server_error":
+        error_message = "Unexpected error while sending the email."
+
     return templates.TemplateResponse(
         "admin.html",
-        {"request": request}
+        {
+            "request": request,
+            "success_message": success_message,
+            "error_message": error_message,
+        },
     )
 
 @app.get("/preview-email", response_class=HTMLResponse)
@@ -127,32 +146,14 @@ async def request_feedback(
                 email_provider_id=resend_data.get("id"),
             )
 
-            return templates.TemplateResponse(
-                "admin.html",
-                {
-                    "request": request,
-                    "success_message": f"Feedback request sent to {recipientEmail}",
-                },
-            )
+            return RedirectResponse(url="/?status=success", status_code=303)
 
         except httpx.HTTPStatusError as exc:
             logger.error(f"Resend rejected the request: {exc.response.text}")
 
-            return templates.TemplateResponse(
-                "admin.html",
-                {
-                    "request": request,
-                    "error_message": "Email could not be sent. Please check the recipient address or your Resend configuration.",
-                },
-            )
+            return RedirectResponse(url="/?status=mail_error", status_code=303)
 
         except Exception as exc:
             logger.exception(f"Unexpected error while sending email: {exc}")
 
-            return templates.TemplateResponse(
-                "admin.html",
-                {
-                    "request": request,
-                    "error_message": "Something went wrong while sending the email.",
-                },
-            )
+            return RedirectResponse(url="/?status=server_error", status_code=303)
