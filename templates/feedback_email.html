@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Preview</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 32px 16px;
+            background: #e9eff4;
+            font-family: Arial, sans-serif;
+            color: #1f2a37;
+        }
+
+        .email-wrapper {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .preview-label {
+            margin-bottom: 16px;
+            color: #5f7383;
+            font-size: 14px;
+        }
+
+        .email-card {
+            background: #f8fbfd;
+            border: 1px solid #d6e2ea;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 8px 24px rgba(32, 55, 70, 0.08);
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: 28px;
+            color: #183142;
+        }
+
+        .meta {
+            margin-bottom: 24px;
+            color: #5f7383;
+            font-size: 14px;
+        }
+
+        .message-box {
+            margin-bottom: 28px;
+            padding: 18px;
+            background: #ffffff;
+            border: 1px solid #dbe5ec;
+            border-radius: 12px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .rating-title {
+            margin: 0 0 14px;
+            font-size: 18px;
+            color: #27485a;
+        }
+
+        .score-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .score-btn {
+            display: inline-block;
+            min-width: 52px;
+            padding: 14px 0;
+            text-align: center;
+            text-decoration: none;
+            background: #6f93ab;
+            color: #ffffff;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .footer-note {
+            color: #7a8d9a;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="preview-label">Email preview</div>
+
+        <div class="email-card">
+            <h1>We’d love your feedback</h1>
+
+            <div class="meta">
+                Recipient: {{ recipient_email }}<br>
+                Identifier: {{ identifier }}
+            </div>
+
+            <div class="message-box">
+{% if message %}
+{{ message }}
+{% else %}
+Thank you for your time. We would really appreciate your feedback.
+{% endif %}
+            </div>
+
+            <h2 class="rating-title">How was your experience?</h2>
+
+            <div class="score-row">
+                <a href="#" class="score-btn">1</a>
+                <a href="#" class="score-btn">2</a>
+                <a href="#" class="score-btn">3</a>
+                <a href="#" class="score-btn">4</a>
+                <a href="#" class="score-btn">5</a>
+            </div>
+
+            <div class="footer-note">
+                In the real email, each score button will point to a unique review link.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
