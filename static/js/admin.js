@@ -1,19 +1,4 @@
-document
-  .getElementById("reviewRequestForm")
-  .addEventListener("submit", function (e) {
-
-    e.preventDefault()
-
-    const email = document.getElementById("recipientEmail").value
-    const identifier = document.getElementById("identifier").value
-    const message = document.getElementById("message").value
-
-    console.log("email:", email)
-    console.log("identifier:", identifier)
-    console.log("message:", message)
-
-})
-
+const form = document.getElementById("reviewRequestForm");
 const previewButton = document.getElementById("previewButton");
 
 previewButton.addEventListener("click", function () {
@@ -28,4 +13,10 @@ previewButton.addEventListener("click", function () {
     });
 
     window.open(`/preview-email?${params.toString()}`, "_blank");
+});
+
+form.addEventListener("submit", function () {
+    form.action = "/request-feedback";
+    form.method = "post";
+    form.target = "_self";
 });

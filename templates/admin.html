@@ -11,6 +11,9 @@
         <div class="card">
             <h1>Request Feedback</h1>
             <p class="subtitle">Send a feedback request email.</p>
+            {% if success_message %}
+                <div class="success-message">{{ success_message }}</div>
+            {% endif %}
 
             <form id="reviewRequestForm">
                 <div class="form-group">

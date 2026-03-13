@@ -201,3 +201,13 @@ button:active {
 .btn-secondary:hover {
     background: #cfdbe3;
 }
+
+.success-message {
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    border: 1px solid #b7d7c3;
+    border-radius: 10px;
+    background: #eaf7ef;
+    color: #24543a;
+    font-size: 0.96rem;
+}
