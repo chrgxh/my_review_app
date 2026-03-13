@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hotel Review Admin</title>
+    <title>Request Feedback</title>
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
     <div class="page">
         <div class="card">
-            <h1>Request a Review</h1>
-            <p class="subtitle">Send a review request email to a guest.</p>
+            <h1>Request Feedback</h1>
+            <p class="subtitle">Send a feedback request email.</p>
 
             <form id="reviewRequestForm">
                 <div class="form-group">
@@ -19,7 +19,7 @@
                         type="email"
                         id="recipientEmail"
                         name="recipientEmail"
-                        placeholder="guest@example.com"
+                        placeholder="name@example.com"
                         required
                     >
                 </div>
@@ -30,7 +30,7 @@
                         type="text"
                         id="identifier"
                         name="identifier"
-                        placeholder="e.g. John Smith / Room 204 / 2026-03-13"
+                        placeholder="e.g. Client A / Project X / 2026-03-13"
                         required
                     >
                 </div>
@@ -41,11 +41,11 @@
                         id="message"
                         name="message"
                         rows="6"
-                        placeholder="Type the message that will appear above the review request..."
+                        placeholder="Type the message that will appear above the feedback request..."
                     ></textarea>
                 </div>
 
-                <button type="submit">Request Review</button>
+                <button type="submit">Request Feedback</button>
             </form>
         </div>
     </div>
