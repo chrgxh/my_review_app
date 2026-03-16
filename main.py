@@ -6,7 +6,7 @@ from loguru import logger
 
 from sqlmodel import Session, select
 
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -87,7 +87,7 @@ async def preview_email(
             "recipient_email": recipientEmail,
             "identifier": identifier,
             "message": message,
-            "feedback_url": "#"
+            "feedback_url": f"{BASE_URL}/feedback"
         }
     )
 
@@ -114,7 +114,7 @@ async def request_feedback(
             )
 
         token = secrets.token_urlsafe(24)
-        feedback_url = f"{BASE_URL}/feedback/{token}"
+        feedback_url = f"{BASE_URL}/feedback"
 
         final_message = message.strip() if message.strip() else (business.default_email_text or "")
 
@@ -123,6 +123,7 @@ async def request_feedback(
             identifier=identifier,
             message=final_message,
             feedback_url=feedback_url,
+            token=token,
         )
 
         try:
@@ -157,3 +158,18 @@ async def request_feedback(
             logger.exception(f"Unexpected error while sending email: {exc}")
 
             return RedirectResponse(url="/?status=server_error", status_code=303)
+
+@app.get("/feedback/{token}", response_class=HTMLResponse)
+async def feedback_page(
+    request: Request,
+    token: str,
+    score: int = Query(..., ge=1, le=10),
+):
+    return templates.TemplateResponse(
+        "feedback_page.html",
+        {
+            "request": request,
+            "token": token,
+            "score": score,
+        },
+    )

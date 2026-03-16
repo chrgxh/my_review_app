@@ -69,7 +69,7 @@
 
         .score-btn {
             display: inline-block;
-            min-width: 52px;
+            min-width: 56px;
             padding: 14px 0;
             text-align: center;
             text-decoration: none;
@@ -110,11 +110,16 @@ Thank you for your time. We would really appreciate your feedback.
             <h2 class="rating-title">How was your experience?</h2>
 
             <div class="score-row">
-                <a href="{{ feedback_url }}" class="score-btn">1</a>
-                <a href="{{ feedback_url }}" class="score-btn">2</a>
-                <a href="{{ feedback_url }}" class="score-btn">3</a>
-                <a href="{{ feedback_url }}" class="score-btn">4</a>
-                <a href="{{ feedback_url }}" class="score-btn">5</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=1" class="score-btn">1</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=2" class="score-btn">2</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=3" class="score-btn">3</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=4" class="score-btn">4</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=5" class="score-btn">5</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=6" class="score-btn">6</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=7" class="score-btn">7</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=8" class="score-btn">8</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=9" class="score-btn">9</a>
+                <a href="{{ feedback_url }}/{{ token }}?score=10" class="score-btn">10</a>
             </div>
 
             <div class="footer-note">
