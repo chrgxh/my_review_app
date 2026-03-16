@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,UTC
 from typing import Optional
 
 from sqlmodel import SQLModel, Field
@@ -15,7 +15,7 @@ class FeedbackRequest(SQLModel, table=True):
     token: str = Field(index=True, unique=True)
     email_provider_id: Optional[str] = Field(default=None, index=True)
     status: str = Field(default="sent", index=True)
-    sent_at: datetime = Field(default_factory=datetime.utcnow)
+    sent_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     opened_at: Optional[datetime] = None
     responded_at: Optional[datetime] = None
     rating: Optional[int] = None

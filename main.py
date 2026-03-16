@@ -20,8 +20,14 @@ from models.feedback_request import FeedbackRequest
 from helpers.email_renderer import render_feedback_email_html
 from helpers.email_sender import send_email_with_resend
 from helpers.db import create_db_and_tables, engine
+from helpers.feedback_validation import validate_feedback_token
 
-from repositories.feedback_requests import create_feedback_request
+from repositories.feedback_requests import (
+    create_feedback_request,
+    get_feedback_request_by_token,
+    respond_to_feedback_request,
+)
+from repositories.businesses import get_business_by_id
 
 load_dotenv()
 
@@ -147,6 +153,10 @@ async def request_feedback(
                 email_provider_id=resend_data.get("id"),
             )
 
+            logger.info(
+                f"Feedback email sent | recipient={recipientEmail} | identifier={identifier} | token={token}"
+            )
+
             return RedirectResponse(url="/?status=success", status_code=303)
 
         except httpx.HTTPStatusError as exc:
@@ -165,6 +175,22 @@ async def feedback_page(
     token: str,
     score: int = Query(..., ge=1, le=10),
 ):
+    with Session(engine) as session:
+
+        feedback_request, error_response = validate_feedback_token(
+            request=request,
+            session=session,
+            templates=templates,
+            token=token,
+        )
+
+        if error_response:
+            return error_response
+        
+    logger.info(
+        f"Feedback page opened | token={token} | request_id={feedback_request.id}"
+    )
+
     return templates.TemplateResponse(
         "feedback_page.html",
         {
@@ -173,3 +199,49 @@ async def feedback_page(
             "score": score,
         },
     )
+
+@app.post("/submit-feedback", response_class=HTMLResponse)
+async def submit_feedback(
+    request: Request,
+    token: str = Form(...),
+    score: int = Form(...),
+    comment: str = Form(""),
+):
+    with Session(engine) as session:
+
+        feedback_request, error_response = validate_feedback_token(
+            request=request,
+            session=session,
+            templates=templates,
+            token=token,
+        )
+
+        if error_response:
+            return error_response
+
+        feedback_request = respond_to_feedback_request(
+            session=session,
+            feedback_request=feedback_request,
+            score=score,
+            comment=comment,
+        )
+
+        logger.info(
+            f"Feedback submitted | token={token} | score={score} | request_id={feedback_request.id}"
+        )
+
+        business = get_business_by_id(session, feedback_request.business_id)
+
+        review_url = business.review_redirect_url if business else None
+        show_review_link = bool(review_url) and score >= 8
+
+        return templates.TemplateResponse(
+            "thank_you.html",
+            {
+                "request": request,
+                "title": "Thank you for your feedback",
+                "message": "We appreciate you taking the time to share your experience.",
+                "show_review_link": show_review_link,
+                "review_url": review_url,
+            },
+        )

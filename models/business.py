@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 from sqlmodel import SQLModel, Field
@@ -15,4 +15,4 @@ class Business(SQLModel, table=True):
     default_email_text: Optional[str] = None
     review_redirect_url: Optional[str] = None
     subscription_end: Optional[datetime] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
