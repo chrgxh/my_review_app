@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Feedback Received</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 32px 16px;
+            background: #e9eff4;
+            font-family: Arial, sans-serif;
+            color: #1f2a37;
+        }
+
+        .email-wrapper {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .email-card {
+            background: #f8fbfd;
+            border: 1px solid #d6e2ea;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 8px 24px rgba(32, 55, 70, 0.08);
+        }
+
+        h1 {
+            margin: 0 0 20px;
+            font-size: 28px;
+            color: #183142;
+        }
+
+        .intro {
+            margin: 0 0 24px;
+            color: #5f7383;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .detail-box {
+            background: #ffffff;
+            border: 1px solid #dbe5ec;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .detail-row {
+            margin-bottom: 14px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .label {
+            font-weight: 700;
+            color: #27485a;
+        }
+
+        .comment {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-card">
+            <h1>New feedback received</h1>
+
+            <p class="intro">
+                A guest has submitted new feedback.
+            </p>
+
+            <div class="detail-box">
+                <div class="detail-row">
+                    <span class="label">Identifier:</span>
+                    {{ identifier }}
+                </div>
+
+                <div class="detail-row">
+                    <span class="label">Recipient email:</span>
+                    {{ recipient_email }}
+                </div>
+
+                <div class="detail-row">
+                    <span class="label">Responded at:</span>
+                    {{ responded_at }}
+                </div>
+
+                <div class="detail-row">
+                    <span class="label">Rating:</span>
+                    {{ rating }}/10
+                </div>
+
+                <div class="detail-row">
+                    <span class="label">Comment:</span><br>
+                    <span class="comment">
+{% if comment %}
+{{ comment }}
+{% else %}
+No comment provided.
+{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

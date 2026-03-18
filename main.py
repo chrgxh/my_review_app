@@ -17,10 +17,11 @@ from models.business import Business
 from models.business_user import BusinessUser
 from models.feedback_request import FeedbackRequest
 
-from helpers.email_renderer import render_feedback_email_html
+from helpers.email_renderer import render_feedback_email_html, render_admin_feedback_notification_html
 from helpers.email_sender import send_email_with_resend
 from helpers.db import create_db_and_tables, engine
 from helpers.feedback_validation import validate_feedback_token
+from helpers.datetime_formatter import format_datetime_for_business
 
 from repositories.feedback_requests import (
     create_feedback_request,
@@ -231,6 +232,36 @@ async def submit_feedback(
         )
 
         business = get_business_by_id(session, feedback_request.business_id)
+
+        if business and business.reply_to_email:
+            admin_html = render_admin_feedback_notification_html(
+                identifier=feedback_request.identifier,
+                recipient_email=feedback_request.recipient_email,
+                rating=feedback_request.rating,
+                comment=feedback_request.comment,
+                responded_at=format_datetime_for_business(
+                feedback_request.responded_at,
+                business.timezone if business else "UTC",
+            ),
+
+            )
+
+            try:
+                await send_email_with_resend(
+                    resend_api_key=RESEND_API_KEY,
+                    from_email=business.from_email,
+                    to_email=business.reply_to_email,
+                    subject=f"New feedback received for {feedback_request.identifier}",
+                    html=admin_html,
+                    reply_to_email=business.reply_to_email,
+                )
+                logger.info(
+                    f"Admin feedback notification sent | token={token} | to={business.reply_to_email}"
+                )
+            except Exception as exc:
+                logger.exception(
+                    f"Failed to send admin feedback notification | token={token} | error={exc}"
+                )
 
         review_url = business.review_redirect_url if business else None
         show_review_link = bool(review_url) and score >= 8

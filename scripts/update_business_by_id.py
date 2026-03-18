@@ -1,9 +1,10 @@
 """
 Example run as module:
 
-python -m scripts.update_business --id 1 --review-redirect-url https://google.com
-python -m scripts.update_business --id 1 --from-email onboarding@resend.dev --reply-to-email example@examplemail.com
-python -m scripts.update_business --id 2 --name "My Hotel" --slug my-hotel --logo-url https://example.com/logo.png
+python -m scripts.update_business_by_id --id 1 --review-redirect-url https://google.com
+python -m scripts.update_business_by_id --id 1 --from-email onboarding@resend.dev --reply-to-email example@examplemail.com
+python -m scripts.update_business_by_id --id 2 --name "My Hotel" --slug my-hotel --logo-url https://example.com/logo.png
+python -m scripts.update_business_by_id --id 1 --timezone Europe/Athens
 """
 
 import argparse
@@ -33,6 +34,11 @@ def build_parser() -> argparse.ArgumentParser:
         dest="review_redirect_url",
         type=str,
         help="Public review redirect URL",
+    )
+    parser.add_argument(
+        "--timezone",
+        type=str,
+        help='Business timezone in IANA format, e.g. "Europe/Athens"',
     )
 
     return parser
@@ -79,6 +85,10 @@ def main():
             business.review_redirect_url = args.review_redirect_url
             updated_fields.append("review_redirect_url")
 
+        if args.timezone is not None:
+            business.timezone = args.timezone
+            updated_fields.append("timezone")
+
         if not updated_fields:
             print("No update fields were provided")
             return
@@ -96,6 +106,7 @@ def main():
         print(f"logo_url={business.logo_url}")
         print(f"default_email_text={business.default_email_text}")
         print(f"review_redirect_url={business.review_redirect_url}")
+        print(f"timezone={business.timezone}")
         print(f"updated_fields={', '.join(updated_fields)}")
 
 

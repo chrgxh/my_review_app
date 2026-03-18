@@ -25,3 +25,22 @@ def render_feedback_email_html(
     )
 
     return html
+
+def render_admin_feedback_notification_html(
+    identifier: str,
+    recipient_email: str,
+    rating: int,
+    comment: str | None,
+    responded_at: str,
+) -> str:
+    template = jinja_env.get_template("admin_feedback_notification.html")
+
+    html = template.render(
+        identifier=identifier,
+        recipient_email=recipient_email,
+        rating=rating,
+        comment=comment,
+        responded_at=responded_at,
+    )
+
+    return html
