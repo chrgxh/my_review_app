@@ -1,14 +1,24 @@
-import os
-from dotenv import load_dotenv
-from loguru import logger
+from functools import lru_cache
 
-load_dotenv()
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-logger.info("Environment variables loaded")
-logger.info(f"RESEND_API_KEY loaded: {os.getenv('RESEND_API_KEY') is not None}")
-logger.info(f"FROM_EMAIL: {os.getenv('FROM_EMAIL')}")
-logger.info(f"BASE_URL: {os.getenv('BASE_URL')}")
 
-RESEND_API_KEY = os.getenv("RESEND_API_KEY")
-FROM_EMAIL = os.getenv("FROM_EMAIL")
-BASE_URL = os.getenv("BASE_URL")
+class Settings(BaseSettings):
+    resend_api_key: str = Field(..., alias="RESEND_API_KEY")
+    from_email: str | None = Field(default=None, alias="FROM_EMAIL")
+    base_url: str = Field(..., alias="BASE_URL")
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()

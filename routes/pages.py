@@ -8,7 +8,7 @@ from fastapi import APIRouter, Request, Query
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from config import BASE_URL
+from config import settings
 
 from helpers.db import engine
 from helpers.feedback_validation import validate_feedback_token
@@ -58,7 +58,7 @@ async def preview_email(
             "recipient_email": recipientEmail,
             "identifier": identifier,
             "message": message,
-            "feedback_url": f"{BASE_URL}/feedback"
+            "feedback_url": f"{settings.base_url}/feedback"
         }
     )
 

@@ -9,7 +9,7 @@ from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from config import BASE_URL, RESEND_API_KEY
+from config import settings
 
 from models.business import Business
 from models.business_user import BusinessUser
@@ -56,7 +56,7 @@ async def request_feedback(
             )
 
         token = secrets.token_urlsafe(24)
-        feedback_url = f"{BASE_URL}/feedback"
+        feedback_url = f"{settings.base_url}/feedback"
 
         final_message = message.strip() if message.strip() else (business.default_email_text or "")
 
@@ -70,7 +70,7 @@ async def request_feedback(
 
         try:
             resend_data = await send_email_with_resend(
-                resend_api_key=RESEND_API_KEY,
+                resend_api_key=settings.resend_api_key,
                 from_email=business.from_email,
                 to_email=recipientEmail,
                 subject="We’d love your feedback",
@@ -152,7 +152,7 @@ async def submit_feedback(
 
             try:
                 await send_email_with_resend(
-                    resend_api_key=RESEND_API_KEY,
+                    resend_api_key=settings.resend_api_key,
                     from_email=business.from_email,
                     to_email=business.reply_to_email,
                     subject=f"New feedback received for {feedback_request.identifier}",
