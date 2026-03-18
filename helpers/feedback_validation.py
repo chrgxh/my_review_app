@@ -1,18 +1,21 @@
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
-from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 from loguru import logger
 
 from repositories.feedback_requests import get_feedback_request_by_token
 
 
-def validate_feedback_token(
+async def validate_feedback_token(
     request: Request,
-    session: Session,
+    session: AsyncSession,
     templates: Jinja2Templates,
     token: str,
 ):
-    feedback_request = get_feedback_request_by_token(session=session, token=token)
+    feedback_request = await get_feedback_request_by_token(
+        session=session,
+        token=token,
+    )
 
     if feedback_request is None:
         logger.warning(f"Invalid feedback token attempted: {token}")

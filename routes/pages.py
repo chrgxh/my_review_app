@@ -1,16 +1,13 @@
-import os
-
 from loguru import logger
 
-from sqlmodel import Session
-
-from fastapi import APIRouter, Request, Query
+from fastapi import APIRouter, Request, Query, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from config import settings
 
-from helpers.db import engine
+from helpers.db import get_session
 from helpers.feedback_validation import validate_feedback_token
 
 router = APIRouter()
@@ -27,10 +24,8 @@ async def admin_page(
 
     if status == "success":
         success_message = "Feedback request sent successfully."
-
     elif status == "mail_error":
         error_message = "Email could not be sent. Please check the recipient address or email configuration."
-
     elif status == "server_error":
         error_message = "Unexpected error while sending the email."
 
@@ -58,8 +53,8 @@ async def preview_email(
             "recipient_email": recipientEmail,
             "identifier": identifier,
             "message": message,
-            "feedback_url": f"{settings.base_url}/feedback"
-        }
+            "feedback_url": f"{settings.base_url}/feedback",
+        },
     )
 
 
@@ -68,19 +63,18 @@ async def feedback_page(
     request: Request,
     token: str,
     score: int = Query(..., ge=1, le=10),
+    session: AsyncSession = Depends(get_session),
 ):
-    with Session(engine) as session:
+    feedback_request, error_response = await validate_feedback_token(
+        request=request,
+        session=session,
+        templates=templates,
+        token=token,
+    )
 
-        feedback_request, error_response = validate_feedback_token(
-            request=request,
-            session=session,
-            templates=templates,
-            token=token,
-        )
+    if error_response:
+        return error_response
 
-        if error_response:
-            return error_response
-        
     logger.info(
         f"Feedback page opened | token={token} | request_id={feedback_request.id}"
     )

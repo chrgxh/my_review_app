@@ -1,12 +1,14 @@
 from datetime import datetime, UTC
 from typing import Optional
 
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from models.feedback_request import FeedbackRequest
 
 
-def create_feedback_request(
-    session: Session,
+async def create_feedback_request(
+    session: AsyncSession,
     *,
     business_id: int,
     sent_by_user_id: int,
@@ -16,7 +18,6 @@ def create_feedback_request(
     token: str,
     email_provider_id: Optional[str],
 ) -> FeedbackRequest:
-
     feedback_request = FeedbackRequest(
         business_id=business_id,
         sent_by_user_id=sent_by_user_id,
@@ -29,22 +30,24 @@ def create_feedback_request(
     )
 
     session.add(feedback_request)
-    session.commit()
-    session.refresh(feedback_request)
+    await session.commit()
+    await session.refresh(feedback_request)
 
     return feedback_request
 
-def get_feedback_request_by_token(
-    session: Session,
+
+async def get_feedback_request_by_token(
+    session: AsyncSession,
     token: str,
 ) -> Optional[FeedbackRequest]:
-    return session.exec(
+    result = await session.exec(
         select(FeedbackRequest).where(FeedbackRequest.token == token)
-    ).first()
+    )
+    return result.first()
 
 
-def respond_to_feedback_request(
-    session: Session,
+async def respond_to_feedback_request(
+    session: AsyncSession,
     feedback_request: FeedbackRequest,
     score: int,
     comment: str | None,
@@ -55,7 +58,7 @@ def respond_to_feedback_request(
     feedback_request.status = "responded"
 
     session.add(feedback_request)
-    session.commit()
-    session.refresh(feedback_request)
+    await session.commit()
+    await session.refresh(feedback_request)
 
     return feedback_request

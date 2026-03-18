@@ -8,7 +8,9 @@ python -m scripts.update_business_by_id --id 1 --timezone Europe/Athens
 """
 
 import argparse
-from sqlmodel import Session
+import asyncio
+
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from helpers.db import engine
 from models.business import Business
@@ -44,12 +46,12 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main():
+async def main():
     parser = build_parser()
     args = parser.parse_args()
 
-    with Session(engine) as session:
-        business = session.get(Business, args.id)
+    async with AsyncSession(engine) as session:
+        business = await session.get(Business, args.id)
 
         if business is None:
             print(f"Business with id={args.id} not found")
@@ -94,8 +96,8 @@ def main():
             return
 
         session.add(business)
-        session.commit()
-        session.refresh(business)
+        await session.commit()
+        await session.refresh(business)
 
         print("Updated business:")
         print(f"id={business.id}")
@@ -111,4 +113,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

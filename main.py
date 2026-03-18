@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-import os
 
 from loguru import logger
 
@@ -15,7 +14,7 @@ from routes import pages, feedback
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    create_db_and_tables()
+    await create_db_and_tables()
     logger.info("Database tables ready")
     logger.info(f"BASE_URL: {settings.base_url}")
     logger.info(f"RESEND_API_KEY loaded: {bool(settings.resend_api_key)}")
