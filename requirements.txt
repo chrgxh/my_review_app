@@ -9,3 +9,4 @@ loguru
 pwdlib[argon2]
 pyyaml
 pydantic_settings
+aiosqlite
