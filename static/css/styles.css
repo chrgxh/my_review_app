@@ -225,3 +225,18 @@ button:active {
 .auth-card {
     max-width: 420px;
 }
+
+.form-link {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.form-link a {
+    color: #5f849d;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.form-link a:hover {
+    text-decoration: underline;
+}

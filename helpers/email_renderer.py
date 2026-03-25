@@ -44,3 +44,12 @@ def render_admin_feedback_notification_html(
     )
 
     return html
+
+def render_password_reset_email_html(reset_link: str) -> str:
+    template = jinja_env.get_template("password_reset_email.html")
+
+    html = template.render(
+        reset_link=reset_link,
+    )
+
+    return html

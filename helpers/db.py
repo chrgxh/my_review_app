@@ -5,6 +5,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from models.business import Business
 from models.business_user import BusinessUser
 from models.feedback_request import FeedbackRequest
+from models.password_reset_token import PasswordResetToken
 
 DATABASE_URL = "sqlite+aiosqlite:///app.db"
 
