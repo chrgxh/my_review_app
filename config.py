@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     resend_api_key: str = Field(..., alias="RESEND_API_KEY")
     from_email: str | None = Field(default=None, alias="FROM_EMAIL")
     base_url: str = Field(..., alias="BASE_URL")
+    secret_key: str = Field(..., alias="SECRET_KEY")
 
     model_config = SettingsConfigDict(
         env_file=".env",

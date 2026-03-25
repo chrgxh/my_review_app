@@ -221,3 +221,7 @@ button:active {
     color: #7a2e2e;
     font-size: 0.96rem;
 }
+
+.auth-card {
+    max-width: 420px;
+}

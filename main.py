@@ -9,7 +9,7 @@ from config import settings
 
 from helpers.db import create_db_and_tables
 
-from routes import pages, feedback
+from routes import pages, feedback, auth
 
 
 @asynccontextmanager
@@ -27,3 +27,4 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(pages.router)
 app.include_router(feedback.router)
+app.include_router(auth.router)
