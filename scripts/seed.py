@@ -1,9 +1,11 @@
+import asyncio
 from datetime import datetime, timedelta, timezone
-import yaml
 from pathlib import Path
 
-from sqlmodel import Session, select
+import yaml
 from pwdlib import PasswordHash
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from helpers.db import engine, create_db_and_tables
 from models.business import Business
@@ -18,23 +20,23 @@ def load_config():
     if not config_path.exists():
         raise RuntimeError("seed_config.yaml not found")
 
-    with open(config_path, "r") as f:
+    with open(config_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
-def main():
-    create_db_and_tables()
+async def main():
+    await create_db_and_tables()
 
     config = load_config()
 
     business_cfg = config["business"]
     user_cfg = config["user"]
 
-    with Session(engine) as session:
-
-        existing_business = session.exec(
+    async with AsyncSession(engine) as session:
+        existing_business_result = await session.exec(
             select(Business).where(Business.slug == business_cfg["slug"])
-        ).first()
+        )
+        existing_business = existing_business_result.first()
 
         if existing_business is None:
             business = Business(
@@ -50,18 +52,18 @@ def main():
             )
 
             session.add(business)
-            session.commit()
-            session.refresh(business)
+            await session.commit()
+            await session.refresh(business)
 
             print(f"Created business: {business.name}")
-
         else:
             business = existing_business
             print(f"Business already exists: {business.name}")
 
-        existing_user = session.exec(
+        existing_user_result = await session.exec(
             select(BusinessUser).where(BusinessUser.email == user_cfg["email"])
-        ).first()
+        )
+        existing_user = existing_user_result.first()
 
         if existing_user is None:
             user = BusinessUser(
@@ -73,13 +75,13 @@ def main():
             )
 
             session.add(user)
-            session.commit()
+            await session.commit()
+            await session.refresh(user)
 
             print(f"Created business user: {user.email}")
-
         else:
             print(f"User already exists: {existing_user.email}")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
