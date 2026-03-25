@@ -7,7 +7,11 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from config import settings
 
+from models.business import Business
+from models.business_user import BusinessUser
+
 from helpers.db import get_session
+from helpers.dependencies import get_current_user, get_current_business
 from helpers.feedback_validation import validate_feedback_token
 
 router = APIRouter()
@@ -18,6 +22,8 @@ templates = Jinja2Templates(directory="templates")
 async def admin_page(
     request: Request,
     status: str | None = None,
+    current_user: BusinessUser = Depends(get_current_user),
+    current_business: Business = Depends(get_current_business),
 ):
     success_message = None
     error_message = None
@@ -35,6 +41,8 @@ async def admin_page(
             "request": request,
             "success_message": success_message,
             "error_message": error_message,
+            "current_user": current_user,
+            "current_business": current_business,
         },
     )
 
@@ -45,6 +53,8 @@ async def preview_email(
     recipientEmail: str = "",
     identifier: str = "",
     message: str = "",
+    current_user: BusinessUser = Depends(get_current_user),
+    current_business: Business = Depends(get_current_business),
 ):
     return templates.TemplateResponse(
         "feedback_email.html",
@@ -54,6 +64,8 @@ async def preview_email(
             "identifier": identifier,
             "message": message,
             "feedback_url": f"{settings.base_url}/feedback",
+            "current_user": current_user,
+            "current_business": current_business,
         },
     )
 

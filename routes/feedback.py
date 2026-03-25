@@ -2,7 +2,6 @@ import httpx
 import secrets
 
 from loguru import logger
-from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from fastapi import APIRouter, Request, Form, Depends
@@ -13,6 +12,7 @@ from config import settings
 
 from models.business import Business
 from models.business_user import BusinessUser
+from helpers.dependencies import get_current_user, get_current_business
 
 from helpers.db import get_session
 from helpers.feedback_validation import validate_feedback_token
@@ -40,28 +40,35 @@ async def request_feedback(
     identifier: str = Form(...),
     message: str = Form(""),
     session: AsyncSession = Depends(get_session),
+    current_user: BusinessUser = Depends(get_current_user),
+    current_business: Business = Depends(get_current_business),
 ):
     logger.info(f"Preparing feedback request for {recipientEmail}")
 
-    business_result = await session.exec(select(Business).order_by(Business.id))
-    business = business_result.first()
-
-    user_result = await session.exec(select(BusinessUser).order_by(BusinessUser.id))
-    user = user_result.first()
-
-    if business is None or user is None:
+    if current_user.id is None or current_business.id is None:
         return templates.TemplateResponse(
             "admin.html",
             {
                 "request": request,
-                "error_message": "No business or business user found. Run the seed script first.",
+                "error_message": "User or business is not configured correctly.",
             },
+            status_code=500,
         )
+
+    current_user_id = current_user.id
+    current_business_id = current_business.id
+    current_business_from_email = current_business.from_email
+    current_business_reply_to_email = current_business.reply_to_email
+    current_business_default_email_text = current_business.default_email_text
 
     token = secrets.token_urlsafe(24)
     feedback_url = f"{settings.base_url}/feedback"
 
-    final_message = message.strip() if message.strip() else (business.default_email_text or "")
+    final_message = (
+        message.strip()
+        if message.strip()
+        else (current_business_default_email_text or "")
+    )
 
     html = render_feedback_email_html(
         recipient_email=recipientEmail,
@@ -74,17 +81,17 @@ async def request_feedback(
     try:
         resend_data = await send_email_with_resend(
             resend_api_key=settings.resend_api_key,
-            from_email=business.from_email,
+            from_email=current_business_from_email,
             to_email=recipientEmail,
             subject="We’d love your feedback",
             html=html,
-            reply_to_email=business.reply_to_email,
+            reply_to_email=current_business_reply_to_email,
         )
 
         await create_feedback_request(
             session=session,
-            business_id=business.id,
-            sent_by_user_id=user.id,
+            business_id=current_business_id,
+            sent_by_user_id=current_user_id,
             recipient_email=recipientEmail,
             identifier=identifier,
             message=final_message or None,
@@ -93,7 +100,7 @@ async def request_feedback(
         )
 
         logger.info(
-            f"Feedback email sent | recipient={recipientEmail} | identifier={identifier} | token={token}"
+            f"Feedback email sent | recipient={recipientEmail} | identifier={identifier} | token={token} | business_id={current_business_id} | user_id={current_user_id}"
         )
 
         return RedirectResponse(url="/?status=success", status_code=303)
