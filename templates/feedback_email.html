@@ -57,24 +57,40 @@
         }
 
         .score-row {
-            text-align: center;
-            margin-bottom: 22px;
+            margin: 0 auto 22px;
+            max-width: 520px;
+        }
+
+        .score-scale {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+            background: #edf4f8;
+            border: 1px solid #cddbe5;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .score-scale td {
+            padding: 0;
         }
 
         .score-btn {
-            display: inline-block;
-            margin: 4px;
-            min-width: 42px;
+            display: block;
+            width: 100%;
             padding: 12px 0;
             text-align: center;
             text-decoration: none;
             background: #edf4f8;
             color: #2c4d63;
-            border: 1px solid #cddbe5;
-            border-radius: 10px;
             font-weight: 700;
             font-size: 15px;
             line-height: 1;
+        }
+
+        .score-scale td + td .score-btn {
+            border-left: 1px solid #dbe5ec;
         }
 
         .footer-note {
@@ -107,29 +123,25 @@
 
             <h1>We’d love your feedback</h1>
 
-            <div class="message-box">
-            {% if message %}
-            {{ message }}
-            {% elif default_email_text %}
-            {{ default_email_text }}
-            {% else %}
-            Thank you for your time. We would really appreciate your feedback.
-            {% endif %}
-            </div>
+            <div class="message-box">{% if message %}{{ message|trim }}{% elif default_email_text %}{{ default_email_text|trim }}{% else %}Thank you for your time. We would really appreciate your feedback.{% endif %}</div>
 
             <h2 class="rating-title">How was your experience?</h2>
 
             <div class="score-row">
-                <a href="{{ feedback_url }}/{{ token }}?score=1" class="score-btn">1</a>
-                <a href="{{ feedback_url }}/{{ token }}?score=2" class="score-btn">2</a>
-                <a href="{{ feedback_url }}/{{ token }}?score=3" class="score-btn">3</a>
-                <a href="{{ feedback_url }}/{{ token }}?score=4" class="score-btn">4</a>
-                <a href="{{ feedback_url }}/{{ token }}?score=5" class="score-btn">5</a>
-                <a href="{{ feedback_url }}/{{ token }}?score=6" class="score-btn">6</a>
-                <a href="{{ feedback_url }}/{{ token }}?score=7" class="score-btn">7</a>
-                <a href="{{ feedback_url }}/{{ token }}?score=8" class="score-btn">8</a>
-                <a href="{{ feedback_url }}/{{ token }}?score=9" class="score-btn">9</a>
-                <a href="{{ feedback_url }}/{{ token }}?score=10" class="score-btn">10</a>
+                <table role="presentation" class="score-scale" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=1" class="score-btn">1</a></td>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=2" class="score-btn">2</a></td>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=3" class="score-btn">3</a></td>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=4" class="score-btn">4</a></td>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=5" class="score-btn">5</a></td>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=6" class="score-btn">6</a></td>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=7" class="score-btn">7</a></td>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=8" class="score-btn">8</a></td>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=9" class="score-btn">9</a></td>
+                        <td><a href="{{ feedback_url }}/{{ token }}?score=10" class="score-btn">10</a></td>
+                    </tr>
+                </table>
             </div>
 
             <div class="footer-note">
