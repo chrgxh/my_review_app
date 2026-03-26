@@ -7,63 +7,70 @@
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
-    <div class="page">
-        <div class="card">
-            <h1>Request Feedback</h1>
-            <p class="subtitle">Send a feedback request email.</p>
-
-            <div class="button-row" style="margin-bottom: 20px;">
-                <a href="/change-password" class="btn-secondary">Change Password</a>
-
-                <form method="post" action="/logout">
-                    <button type="submit" class="btn-secondary">Log out</button>
-                </form>
+    <div class="app-shell">
+        <div class="content-frame">
+            <div class="top-tabs">
+                <a href="/" class="tab active">Request Feedback</a>
+                <a href="/analytics" class="tab">Analytics</a>
             </div>
 
-            {% if success_message %}
-                <div class="success-message">{{ success_message }}</div>
-            {% endif %}
-            {% if error_message %}
-                <div class="error-message">{{ error_message }}</div>
-            {% endif %}
+            <div class="card card-with-tabs">
+                <h1>Request Feedback</h1>
+                <p class="subtitle">Send a feedback request email.</p>
 
-            <form id="reviewRequestForm" action="/request-feedback" method="post">
-                <div class="form-group">
-                    <label for="recipientEmail">Recipient email</label>
-                    <input
-                        type="email"
-                        id="recipientEmail"
-                        name="recipientEmail"
-                        placeholder="name@example.com"
-                        required
-                    >
-                </div>
+                {% if success_message %}
+                    <div class="success-message">{{ success_message }}</div>
+                {% endif %}
+                {% if error_message %}
+                    <div class="error-message">{{ error_message }}</div>
+                {% endif %}
 
-                <div class="form-group">
-                    <label for="identifier">Identifier</label>
-                    <input
-                        type="text"
-                        id="identifier"
-                        name="identifier"
-                        placeholder="e.g. Client A / Project X / 2026-03-13"
-                        required
-                    >
-                </div>
+                <form id="reviewRequestForm" action="/request-feedback" method="post">
+                    <div class="form-group">
+                        <label for="recipientEmail">Recipient email</label>
+                        <input
+                            type="email"
+                            id="recipientEmail"
+                            name="recipientEmail"
+                            placeholder="name@example.com"
+                            required
+                        >
+                    </div>
 
-                <div class="form-group">
-                    <label for="message">Email message</label>
-                    <textarea
-                        id="message"
-                        name="message"
-                        rows="6"
-                        placeholder="Type the message that will appear above the feedback request..."
-                    ></textarea>
-                </div>
+                    <div class="form-group">
+                        <label for="identifier">Identifier</label>
+                        <input
+                            type="text"
+                            id="identifier"
+                            name="identifier"
+                            placeholder="e.g. Client A / Project X / 2026-03-13"
+                            required
+                        >
+                    </div>
 
-                <div class="button-row">
-                    <button type="submit" class="btn-primary">Request Feedback</button>
-                    <button type="button" id="previewButton" class="btn-secondary">Preview</button>
-                </div>
+                    <div class="form-group">
+                        <label for="message">Email message</label>
+                        <textarea
+                            id="message"
+                            name="message"
+                            rows="6"
+                            placeholder="Type the message that will appear above the feedback request..."
+                        ></textarea>
+                    </div>
+
+                    <div class="button-row">
+                        <button type="submit" class="btn-primary">Request Feedback</button>
+                        <button type="button" id="previewButton" class="btn-secondary">Preview</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="utility-actions">
+            <a href="/change-password" class="utility-link">Change Password</a>
+
+            <form method="post" action="/logout">
+                <button type="submit" class="utility-link-button">Log out</button>
             </form>
         </div>
     </div>

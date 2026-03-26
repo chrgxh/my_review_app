@@ -99,3 +99,10 @@ async def feedback_page(
             "score": score,
         },
     )
+
+@router.get("/analytics", response_class=HTMLResponse)
+async def analytics_page(request: Request):
+    return templates.TemplateResponse(
+        "analytics_dashboard.html",
+        {"request": request},
+    )

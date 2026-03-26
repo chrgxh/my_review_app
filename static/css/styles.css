@@ -9,103 +9,64 @@ body {
     color: #1f2a37;
 }
 
-.page {
+.app-shell {
     min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 48px 20px;
+    position: relative;
+    padding: 36px 20px 90px;
 }
 
-.card {
+.content-frame {
     width: 100%;
     max-width: 640px;
-    background: #f8fbfd;
-    border: 1px solid #d6e2ea;
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: 0 8px 24px rgba(32, 55, 70, 0.08);
+    margin: 0 auto;
 }
 
-h1 {
-    margin: 0 0 8px;
-    font-size: 2.2rem;
-    color: #183142;
+.top-tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 0;
+    padding-left: 12px;
 }
 
-.subtitle {
-    margin: 0 0 28px;
+.tab {
+    display: inline-block;
+    padding: 12px 18px;
+    background: #dbe5ec;
     color: #5f7383;
-    font-size: 0.98rem;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
+    text-decoration: none;
     font-weight: 600;
+    font-size: 0.98rem;
+    border: 1px solid #d6e2ea;
+    border-bottom: none;
+    border-radius: 14px 14px 0 0;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tab:hover {
+    background: #d1dde6;
     color: #27485a;
 }
 
-input,
-textarea {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #bfd0db;
-    border-radius: 10px;
-    background: #ffffff;
-    font-size: 1rem;
-    color: #1f2a37;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 140px;
-}
-
-input:focus,
-textarea:focus {
-    border-color: #7ea6bf;
-    box-shadow: 0 0 0 3px rgba(126, 166, 191, 0.18);
-}
-
-input::placeholder,
-textarea::placeholder {
-    color: #8ba0af;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #e9eff4;
-    color: #1f2a37;
-}
-
-.page {
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 48px 20px;
+.tab.active {
+    background: #f8fbfd;
+    color: #183142;
+    position: relative;
+    top: 1px;
+    z-index: 2;
 }
 
 .card {
     width: 100%;
-    max-width: 640px;
     background: #f8fbfd;
     border: 1px solid #d6e2ea;
     border-radius: 16px;
     padding: 32px;
     box-shadow: 0 8px 24px rgba(32, 55, 70, 0.08);
+}
+
+.card-with-tabs {
+    border-top-left-radius: 16px;
 }
 
 h1 {
@@ -222,6 +183,15 @@ button:active {
     font-size: 0.96rem;
 }
 
+.info-message {
+    padding: 14px 16px;
+    border: 1px solid #d6e2ea;
+    border-radius: 10px;
+    background: #eef4f8;
+    color: #4f6780;
+    font-size: 0.96rem;
+}
+
 .auth-card {
     max-width: 420px;
 }
@@ -239,4 +209,88 @@ button:active {
 
 .form-link a:hover {
     text-decoration: underline;
+}
+
+.utility-actions {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    z-index: 20;
+}
+
+.utility-actions form {
+    margin: 0;
+}
+
+.utility-link,
+.utility-link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: #4f6780;
+    font: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.utility-link:hover,
+.utility-link-button:hover {
+    color: #17324a;
+    text-decoration: underline;
+}
+
+.utility-link-button {
+    appearance: none;
+}
+
+.button-row a.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 80px;
+}
+
+@media (max-width: 768px) {
+    .app-shell {
+        padding: 24px 16px 96px;
+    }
+
+    .card {
+        padding: 24px;
+    }
+
+    h1 {
+        font-size: 1.9rem;
+    }
+
+    .top-tabs {
+        padding-left: 0;
+    }
+
+    .tab {
+        padding: 10px 14px;
+        font-size: 0.92rem;
+    }
+
+    .utility-actions {
+        right: 16px;
+        bottom: 16px;
+        gap: 14px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        max-width: 90vw;
+    }
 }
