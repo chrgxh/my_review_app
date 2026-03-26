@@ -63,6 +63,8 @@ async def request_feedback(
     current_business_from_email = current_business.from_email
     current_business_reply_to_email = current_business.reply_to_email
     current_business_default_email_text = current_business.default_email_text
+    current_business_name = current_business.name
+    current_business_logo_url = current_business.logo_url
 
     token = secrets.token_urlsafe(24)
     feedback_url = f"{settings.base_url}/feedback"
@@ -77,8 +79,11 @@ async def request_feedback(
         recipient_email=recipientEmail,
         identifier=identifier,
         message=final_message,
+        default_email_text=current_business_default_email_text,
         feedback_url=feedback_url,
         token=token,
+        business_name=current_business_name,
+        logo_url=current_business_logo_url,
     )
 
     try:

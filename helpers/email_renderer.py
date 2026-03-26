@@ -10,8 +10,11 @@ def render_feedback_email_html(
     recipient_email: str,
     identifier: str,
     message: str,
+    default_email_text: str | None,
     feedback_url: str,
     token: str,
+    business_name: str | None,
+    logo_url: str | None,
 ) -> str:
 
     template = jinja_env.get_template("feedback_email.html")
@@ -20,8 +23,11 @@ def render_feedback_email_html(
         recipient_email=recipient_email,
         identifier=identifier,
         message=message,
+        default_email_text=default_email_text,
         feedback_url=feedback_url,
         token=token,
+        business_name=business_name,
+        logo_url=logo_url,
     )
 
     return html
