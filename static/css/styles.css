@@ -1,3 +1,9 @@
+/* =========================================================
+   Global reset and base layout
+   Basic page-wide defaults such as box sizing, body colors,
+   and shared container shells.
+   ========================================================= */
+
 * {
     box-sizing: border-box;
 }
@@ -20,6 +26,12 @@ body {
     max-width: 640px;
     margin: 0 auto;
 }
+
+
+/* =========================================================
+   Top tabs navigation
+   Styles for the tab bar and active/inactive tab states.
+   ========================================================= */
 
 .top-tabs {
     display: flex;
@@ -56,6 +68,12 @@ body {
     z-index: 2;
 }
 
+
+/* =========================================================
+   Card containers
+   Shared card styling used across forms and content blocks.
+   ========================================================= */
+
 .card {
     width: 100%;
     background: #f8fbfd;
@@ -69,6 +87,26 @@ body {
     border-top-left-radius: 16px;
 }
 
+.auth-card {
+    max-width: 420px;
+}
+
+.feedback-card {
+    width: 100%;
+    max-width: 680px;
+}
+
+.feedback-message-card {
+    width: 100%;
+    max-width: 680px;
+}
+
+
+/* =========================================================
+   Typography
+   Headings, subtitles, section headings, and message text.
+   ========================================================= */
+
 h1 {
     margin: 0 0 8px;
     font-size: 2.2rem;
@@ -81,6 +119,25 @@ h1 {
     font-size: 0.98rem;
 }
 
+.section-title {
+    margin: 0 0 14px;
+    font-size: 1.1rem;
+    color: #27485a;
+}
+
+.message {
+    margin: 0;
+    color: #5f7383;
+    font-size: 0.96rem;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   Form structure
+   Shared spacing and label styling for form fields.
+   ========================================================= */
+
 .form-group {
     margin-bottom: 20px;
 }
@@ -91,6 +148,12 @@ label {
     font-weight: 600;
     color: #27485a;
 }
+
+
+/* =========================================================
+   Inputs and textarea
+   Shared field appearance, focus states, and placeholders.
+   ========================================================= */
 
 input,
 textarea {
@@ -121,6 +184,12 @@ textarea::placeholder {
     color: #8ba0af;
 }
 
+
+/* =========================================================
+   Button layout
+   Row-level alignment for grouped buttons and nested forms.
+   ========================================================= */
+
 .button-row {
     display: flex;
     align-items: center;
@@ -130,6 +199,19 @@ textarea::placeholder {
 .button-row form {
     margin: 0;
 }
+
+.button-row a.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   Buttons
+   Base button styling plus primary and secondary variants.
+   ========================================================= */
 
 button {
     border: none;
@@ -145,7 +227,7 @@ button:active {
 
 .btn {
     display: inline-flex;
-    align-items: center;   
+    align-items: center;
     justify-content: center;
     padding: 10px 16px;
     border-radius: 8px;
@@ -183,6 +265,12 @@ button:active {
     background: #cfdbe3;
 }
 
+
+/* =========================================================
+   Status messages
+   Success, error, and neutral informational message boxes.
+   ========================================================= */
+
 .success-message {
     margin-bottom: 20px;
     padding: 12px 14px;
@@ -212,9 +300,11 @@ button:active {
     font-size: 0.96rem;
 }
 
-.auth-card {
-    max-width: 420px;
-}
+
+/* =========================================================
+   Inline form links
+   Small links shown below forms such as forgot-password links.
+   ========================================================= */
 
 .form-link {
     margin-top: 16px;
@@ -230,6 +320,12 @@ button:active {
 .form-link a:hover {
     text-decoration: underline;
 }
+
+
+/* =========================================================
+   Utility actions
+   Fixed-position links/buttons shown at the bottom corner.
+   ========================================================= */
 
 .utility-actions {
     position: fixed;
@@ -268,12 +364,11 @@ button:active {
     appearance: none;
 }
 
-.button-row a.btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-}
+
+/* =========================================================
+   Auth page layout
+   Centers the authentication/feedback card in the viewport.
+   ========================================================= */
 
 .auth-page {
     min-height: 100vh;
@@ -282,6 +377,110 @@ button:active {
     align-items: flex-start;
     padding-top: 80px;
 }
+
+
+/* =========================================================
+   Feedback score slider
+   Slider track, thumb, focus state, and tick labels.
+   ========================================================= */
+
+.score-scale-wrapper {
+    margin-bottom: 28px;
+}
+
+.score-slider-row {
+    margin-bottom: 10px;
+}
+
+.score-slider {
+    width: 100%;
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* Track */
+.score-slider::-webkit-slider-runnable-track {
+    height: 10px;
+    background: #bfd0db;
+    border-radius: 999px;
+    border: none;
+}
+
+.score-slider::-moz-range-track {
+    height: 10px;
+    background: #bfd0db;
+    border-radius: 999px;
+    border: none;
+}
+
+/* Thumb */
+.score-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: #183142;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(24, 49, 66, 0.18);
+}
+
+.score-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #183142;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(24, 49, 66, 0.18);
+}
+
+/* Focus */
+.score-slider:focus {
+    outline: none;
+}
+
+.score-slider:focus::-webkit-slider-runnable-track {
+    box-shadow: 0 0 0 3px rgba(126, 166, 191, 0.18);
+}
+
+.score-slider:focus::-moz-range-track {
+    box-shadow: 0 0 0 3px rgba(126, 166, 191, 0.18);
+}
+
+.score-ticks {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    margin-top: 8px;
+    color: #6f8392;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+
+/* =========================================================
+   Review link block
+   Spacing and button sizing for review-link sections.
+   ========================================================= */
+
+.review-link-wrapper {
+    margin-top: 24px;
+}
+
+.review-link-wrapper .btn-primary {
+    flex: 0 0 auto;
+}
+
+
+/* =========================================================
+   Responsive styles
+   Tablet/mobile adjustments for spacing, typography,
+   slider thumb size, and fixed utility actions.
+   ========================================================= */
 
 @media (max-width: 768px) {
     .app-shell {
@@ -305,6 +504,31 @@ button:active {
         font-size: 0.92rem;
     }
 
+    .auth-page {
+        padding: 20px 12px 40px;
+        align-items: flex-start;
+    }
+
+    .feedback-card {
+        max-width: 100%;
+    }
+
+    .score-slider::-webkit-slider-thumb {
+        width: 22px;
+        height: 22px;
+        margin-top: -6px;
+    }
+
+    .score-slider::-moz-range-thumb {
+        width: 22px;
+        height: 22px;
+    }
+
+    .score-ticks {
+        font-size: 0.68rem;
+        margin-top: 10px;
+    }
+
     .utility-actions {
         right: 16px;
         bottom: 16px;
@@ -313,69 +537,4 @@ button:active {
         justify-content: flex-end;
         max-width: 90vw;
     }
-}
-
-.feedback-card {
-    width: 100%;
-    max-width: 680px;
-}
-
-.section-title {
-    margin: 0 0 14px;
-    font-size: 1.1rem;
-    color: #27485a;
-}
-
-.score-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
-}
-
-.score-option input[type="radio"] {
-    display: none;
-}
-
-.score-label {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 56px;
-    padding: 14px 0;
-    background: #6f93ab;
-    color: #ffffff;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.15s ease, opacity 0.15s ease;
-}
-
-.score-label:hover {
-    opacity: 0.9;
-}
-
-.score-option input[type="radio"]:checked + .score-label {
-    background: #183142;
-}
-
-.feedback-message-card {
-    width: 100%;
-    max-width: 680px;
-}
-
-.message {
-    margin: 0;
-    color: #5f7383;
-    font-size: 0.96rem;
-    line-height: 1.6;
-}
-
-.review-link-wrapper {
-    margin-top: 24px;
-}
-
-.review-link-wrapper .btn-primary {
-    flex: 0 0 auto;
 }

@@ -20,56 +20,32 @@
 
                 <h2 class="section-title">Your score</h2>
 
-                <div class="score-row">
-                    <label class="score-option">
-                        <input type="radio" name="score" value="1" {% if score == 1 %}checked{% endif %}>
-                        <span class="score-label">1</span>
-                    </label>
+                <div class="score-scale-wrapper">
+                    <div class="score-slider-row">
+                        <input
+                            id="score"
+                            class="score-slider"
+                            type="range"
+                            name="score"
+                            min="1"
+                            max="10"
+                            step="1"
+                            value="{% if score %}{{ score }}{% else %}7{% endif %}"
+                        >
+                    </div>
 
-                    <label class="score-option">
-                        <input type="radio" name="score" value="2" {% if score == 2 %}checked{% endif %}>
-                        <span class="score-label">2</span>
-                    </label>
-
-                    <label class="score-option">
-                        <input type="radio" name="score" value="3" {% if score == 3 %}checked{% endif %}>
-                        <span class="score-label">3</span>
-                    </label>
-
-                    <label class="score-option">
-                        <input type="radio" name="score" value="4" {% if score == 4 %}checked{% endif %}>
-                        <span class="score-label">4</span>
-                    </label>
-
-                    <label class="score-option">
-                        <input type="radio" name="score" value="5" {% if score == 5 %}checked{% endif %}>
-                        <span class="score-label">5</span>
-                    </label>
-
-                    <label class="score-option">
-                        <input type="radio" name="score" value="6" {% if score == 6 %}checked{% endif %}>
-                        <span class="score-label">6</span>
-                    </label>
-
-                    <label class="score-option">
-                        <input type="radio" name="score" value="7" {% if score == 7 %}checked{% endif %}>
-                        <span class="score-label">7</span>
-                    </label>
-
-                    <label class="score-option">
-                        <input type="radio" name="score" value="8" {% if score == 8 %}checked{% endif %}>
-                        <span class="score-label">8</span>
-                    </label>
-
-                    <label class="score-option">
-                        <input type="radio" name="score" value="9" {% if score == 9 %}checked{% endif %}>
-                        <span class="score-label">9</span>
-                    </label>
-
-                    <label class="score-option">
-                        <input type="radio" name="score" value="10" {% if score == 10 %}checked{% endif %}>
-                        <span class="score-label">10</span>
-                    </label>
+                    <div class="score-ticks" aria-hidden="true">
+                        <span>1</span>
+                        <span>2</span>
+                        <span>3</span>
+                        <span>4</span>
+                        <span>5</span>
+                        <span>6</span>
+                        <span>7</span>
+                        <span>8</span>
+                        <span>9</span>
+                        <span>10</span>
+                    </div>
                 </div>
 
                 <h2 class="section-title">Additional comments (optional)</h2>
