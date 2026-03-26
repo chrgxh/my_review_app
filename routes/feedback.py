@@ -32,6 +32,9 @@ from repositories.businesses import get_business_by_id
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
+@router.get("/request-feedback")
+async def request_feedback_get():
+    return RedirectResponse(url="/", status_code=303)
 
 @router.post("/request-feedback", response_class=HTMLResponse)
 async def request_feedback(

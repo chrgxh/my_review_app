@@ -105,7 +105,7 @@ async def login(
     token = create_session_token(user.id)
 
     response = RedirectResponse(
-        url="/dashboard",
+        url="/",
         status_code=status.HTTP_303_SEE_OTHER,
     )
     response.set_cookie(
@@ -117,18 +117,6 @@ async def login(
         secure=False,
     )
     return response
-
-
-@router.get("/dashboard", response_class=HTMLResponse)
-async def dashboard(
-    request: Request,
-    current_user: BusinessUser = Depends(get_current_user),
-):
-    return templates.TemplateResponse(
-        "dashboard.html",
-        {"request": request, "current_user": current_user},
-    )
-
 
 @router.post("/logout")
 async def logout():
