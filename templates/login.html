@@ -20,14 +20,13 @@
             <div class="button-row">
                 <a href="/" class="btn btn-primary">Continue</a>
 
-                <form method="post" action="/logout" style="margin: 0;">
-                    <button type="submit" class="btn btn-secondary">
-                        Log out
-                    </button>
+                <form method="post" action="/logout">
+                    <button type="submit" class="btn btn-secondary">Log out</button>
                 </form>
             </div>
         </div>
     </div>
+
 {% else %}
 
     <div class="auth-page">
@@ -69,10 +68,10 @@
                 </div>
 
                 <div class="button-row">
-                    <button type="submit" class="btn-primary">Log in</button>
+                    <button type="submit" class="btn btn-primary">Log in</button>
                 </div>
 
-                <div style="margin-top: 16px; text-align: center;">
+                <div class="form-link">
                     <a href="/forgot-password">Forgot your password?</a>
                 </div>
             </form>

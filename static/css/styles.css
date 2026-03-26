@@ -127,6 +127,10 @@ textarea::placeholder {
     gap: 12px;
 }
 
+.button-row form {
+    margin: 0;
+}
+
 button {
     border: none;
     border-radius: 10px;
@@ -144,7 +148,7 @@ button:active {
     align-items: center;   
     justify-content: center;
     padding: 10px 16px;
-    border-radius: 8px;   /* THIS is the key */
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     text-decoration: none;
@@ -309,4 +313,69 @@ button:active {
         justify-content: flex-end;
         max-width: 90vw;
     }
+}
+
+.feedback-card {
+    width: 100%;
+    max-width: 680px;
+}
+
+.section-title {
+    margin: 0 0 14px;
+    font-size: 1.1rem;
+    color: #27485a;
+}
+
+.score-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+}
+
+.score-option input[type="radio"] {
+    display: none;
+}
+
+.score-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    padding: 14px 0;
+    background: #6f93ab;
+    color: #ffffff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.score-label:hover {
+    opacity: 0.9;
+}
+
+.score-option input[type="radio"]:checked + .score-label {
+    background: #183142;
+}
+
+.feedback-message-card {
+    width: 100%;
+    max-width: 680px;
+}
+
+.message {
+    margin: 0;
+    color: #5f7383;
+    font-size: 0.96rem;
+    line-height: 1.6;
+}
+
+.review-link-wrapper {
+    margin-top: 24px;
+}
+
+.review-link-wrapper .btn-primary {
+    flex: 0 0 auto;
 }
