@@ -63,9 +63,12 @@ async def preview_email(
             "recipient_email": recipientEmail,
             "identifier": identifier,
             "message": message,
+            "default_email_text": current_business.default_email_text,
             "feedback_url": f"{settings.base_url}/feedback",
             "current_user": current_user,
             "current_business": current_business,
+            "business_name": current_business.name,
+            "logo_url": current_business.logo_url,
         },
     )
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Preview</title>
+    <title>We’d love your feedback</title>
     <style>
         body {
             margin: 0;
@@ -16,12 +16,7 @@
         .email-wrapper {
             max-width: 680px;
             margin: 0 auto;
-        }
-
-        .preview-label {
-            margin-bottom: 16px;
-            color: #5f7383;
-            font-size: 14px;
+            text-align: center;
         }
 
         .email-card {
@@ -32,55 +27,64 @@
             box-shadow: 0 8px 24px rgba(32, 55, 70, 0.08);
         }
 
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+        }
+
         h1 {
-            margin: 0 0 12px;
-            font-size: 28px;
+            margin: 0 0 16px;
+            font-size: 26px;
             color: #183142;
         }
 
-        .meta {
-            margin-bottom: 24px;
-            color: #5f7383;
-            font-size: 14px;
-        }
-
         .message-box {
-            margin-bottom: 28px;
+            margin: 0 auto 28px;
             padding: 18px;
             background: #ffffff;
             border: 1px solid #dbe5ec;
             border-radius: 12px;
+            max-width: 520px;
+            text-align: left;
             white-space: pre-wrap;
             line-height: 1.6;
         }
 
         .rating-title {
-            margin: 0 0 14px;
+            margin: 0 0 16px;
             font-size: 18px;
             color: #27485a;
         }
 
         .score-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
+            text-align: center;
+            margin-bottom: 22px;
         }
 
         .score-btn {
             display: inline-block;
-            min-width: 56px;
-            padding: 14px 0;
+            margin: 4px;
+            min-width: 42px;
+            padding: 12px 0;
             text-align: center;
             text-decoration: none;
-            background: #6f93ab;
-            color: #ffffff;
+            background: #edf4f8;
+            color: #2c4d63;
+            border: 1px solid #cddbe5;
             border-radius: 10px;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 15px;
+            line-height: 1;
         }
 
         .footer-note {
+            color: #7a8d9a;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .business-name {
+            margin-top: 10px;
             color: #7a8d9a;
             font-size: 13px;
             line-height: 1.5;
@@ -89,22 +93,28 @@
 </head>
 <body>
     <div class="email-wrapper">
-        <div class="preview-label">Email preview</div>
-
         <div class="email-card">
+
+            {% if logo_url %}
+                <div style="margin:-32px -32px 24px -32px;">
+                    <img
+                        src="{{ logo_url }}"
+                        alt="{{ business_name or 'Logo' }}"
+                        style="display:block; width:100%; height:auto; border-top-left-radius:16px; border-top-right-radius:16px;"
+                    >
+                </div>
+            {% endif %}
+
             <h1>We’d love your feedback</h1>
 
-            <div class="meta">
-                Recipient: {{ recipient_email }}<br>
-                Identifier: {{ identifier }}
-            </div>
-
             <div class="message-box">
-{% if message %}
-{{ message }}
-{% else %}
-Thank you for your time. We would really appreciate your feedback.
-{% endif %}
+            {% if message %}
+            {{ message }}
+            {% elif default_email_text %}
+            {{ default_email_text }}
+            {% else %}
+            Thank you for your time. We would really appreciate your feedback.
+            {% endif %}
             </div>
 
             <h2 class="rating-title">How was your experience?</h2>
@@ -123,8 +133,15 @@ Thank you for your time. We would really appreciate your feedback.
             </div>
 
             <div class="footer-note">
-                In the real email, each score button will point to a unique review link.
+                Click a score to submit your feedback.
             </div>
+
+            {% if business_name %}
+                <div class="business-name">
+                    {{ business_name }}
+                </div>
+            {% endif %}
+
         </div>
     </div>
 </body>
