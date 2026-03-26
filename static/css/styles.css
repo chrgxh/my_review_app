@@ -139,6 +139,22 @@ button:active {
     transform: translateY(1px);
 }
 
+.btn {
+    display: inline-flex;
+    align-items: center;   
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 8px;   /* THIS is the key */
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn:hover {
+    text-decoration: none;
+}
+
 .btn-primary {
     flex: 1;
     padding: 13px 16px;

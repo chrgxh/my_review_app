@@ -17,7 +17,7 @@ from helpers.reset_tokens import (
 from helpers.db import get_session
 from helpers.auth import COOKIE_MAX_AGE, COOKIE_NAME, create_session_token
 from helpers.security import verify_password, hash_password
-from helpers.dependencies import get_current_user
+from helpers.dependencies import get_current_user, get_current_user_optional
 from repositories.business_user_repository import get_business_user_by_email
 from repositories.password_reset_token_repository import (
     create_password_reset_token,
@@ -40,7 +40,10 @@ FLASH_COOKIE_MAX_AGE = 10
 
 
 @router.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
+async def login_page(
+    request: Request,
+    current_user: BusinessUser | None = Depends(get_current_user_optional),
+):
     error = None
     success = None
 
@@ -56,6 +59,7 @@ async def login_page(request: Request):
             "request": request,
             "error": error,
             "success": success,
+            "current_user": current_user,
         },
     )
 
@@ -66,10 +70,18 @@ async def login_page(request: Request):
 
 @router.post("/login")
 async def login(
+    request: Request,
     email: str = Form(...),
     password: str = Form(...),
     session: AsyncSession = Depends(get_session),
+    current_user: BusinessUser | None = Depends(get_current_user_optional),
 ):
+    if current_user is not None:
+        return RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+
     user = await get_business_user_by_email(session, email)
 
     if user is None or not user.is_active or not verify_password(password, user.password_hash):
