@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="app-shell">
-        <div class="content-frame">
+        <div class="content-frame content-frame-wide">
             <div class="top-tabs">
                 <a href="/" class="tab">Request Feedback</a>
                 <a href="/analytics" class="tab active">Analytics</a>
@@ -16,10 +16,186 @@
 
             <div class="card card-with-tabs">
                 <h1>Analytics</h1>
-                <p class="subtitle">Track feedback performance and trends.</p>
+                <p class="subtitle">Track feedback performance and explore request records.</p>
 
-                <div class="info-message">
-                    Under development.
+                <form method="get" action="/analytics" class="analytics-filter-form">
+                    <div class="analytics-filter-grid">
+                        <div class="form-group">
+                            <label for="kpi_from">From</label>
+                            <input
+                                type="date"
+                                id="kpi_from"
+                                name="kpi_from"
+                                value="{{ kpi_from.isoformat() if kpi_from else '' }}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="kpi_to">To</label>
+                            <input
+                                type="date"
+                                id="kpi_to"
+                                name="kpi_to"
+                                value="{{ kpi_to.isoformat() if kpi_to else '' }}"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button type="submit" class="btn btn-primary">Apply Filter</button>
+                        <a href="/analytics" class="btn btn-secondary">All Time</a>
+                    </div>
+                </form>
+
+                <div class="analytics-kpi-grid">
+                    <div class="analytics-kpi-card">
+                        <div class="analytics-kpi-label">Average Score</div>
+                        <div class="analytics-kpi-value">
+                            {{ avg_score if avg_score is not none else "—" }}
+                        </div>
+                    </div>
+
+                    <div class="analytics-kpi-card">
+                        <div class="analytics-kpi-label">Response Rate</div>
+                        <div class="analytics-kpi-value">
+                            {% if response_rate is not none %}{{ response_rate }}%{% else %}—{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="analytics-kpi-card">
+                        <div class="analytics-kpi-label">Requests Sent</div>
+                        <div class="analytics-kpi-value">{{ total_requests }}</div>
+                    </div>
+
+                    <div class="analytics-kpi-card">
+                        <div class="analytics-kpi-label">Responses Received</div>
+                        <div class="analytics-kpi-value">{{ total_responses }}</div>
+                    </div>
+
+                    <div class="analytics-kpi-card analytics-kpi-card-wide">
+                        <div class="analytics-kpi-label">Comment Rate</div>
+                        <div class="analytics-kpi-value">
+                            {% if comment_rate is not none %}{{ comment_rate }}%{% else %}—{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card analytics-section-card">
+                <h2 class="section-title">Score Distribution</h2>
+
+                {% set max_count = score_distribution.values() | max if score_distribution else 0 %}
+                {% set axis_max = max_count if max_count > 0 else 1 %}
+
+                <div class="score-chart">
+                    <div class="score-chart-y-axis">
+                        <span>{{ axis_max }}</span>
+                        <span>{{ (axis_max * 0.75) | round(0, 'floor') | int }}</span>
+                        <span>{{ (axis_max * 0.5) | round(0, 'floor') | int }}</span>
+                        <span>{{ (axis_max * 0.25) | round(0, 'floor') | int }}</span>
+                        <span>0</span>
+                    </div>
+
+                    <div class="score-chart-main">
+                        <div class="score-distribution-vertical">
+                            {% for score in range(1, 11) %}
+                                {% set count = score_distribution.get(score, 0) %}
+                                {% set height = ((count / axis_max) * 100) if axis_max > 0 else 0 %}
+
+                                <div class="score-bar-column">
+                                    <div class="score-bar-wrapper">
+                                        <div
+                                            class="score-bar"
+                                            style="height: {{ height }}%;"
+                                        ></div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="score-x-axis-labels">
+                            {% for score in range(1, 11) %}
+                                <div class="score-x-axis-label">{{ score }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card analytics-section-card">
+                <h2 class="section-title">Request Records</h2>
+                <p class="subtitle analytics-section-subtitle">
+                    Search request records using filters below.
+                </p>
+
+                <form method="get" action="/analytics/records" class="analytics-records-form">
+                    <div class="analytics-records-grid">
+                        <div class="form-group">
+                            <label for="recipient_email">Recipient Email</label>
+                            <input
+                                type="text"
+                                id="recipient_email"
+                                name="recipient_email"
+                                placeholder="name@example.com"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="identifier">Identifier</label>
+                            <input
+                                type="text"
+                                id="identifier"
+                                name="identifier"
+                                placeholder="Search identifier"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="responded_state">Responded State</label>
+                            <select id="responded_state" name="responded_state">
+                                <option value="">All</option>
+                                <option value="responded">Responded</option>
+                                <option value="not_responded">Not Responded</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rating">Rating</label>
+                            <select id="rating" name="rating">
+                                <option value="">All</option>
+                                {% for score in range(1, 11) %}
+                                    <option value="{{ score }}">{{ score }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="has_comment">Has Comment</label>
+                            <select id="has_comment" name="has_comment">
+                                <option value="">All</option>
+                                <option value="yes">With Comment</option>
+                                <option value="no">Without Comment</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sent_from">Sent From</label>
+                            <input type="date" id="sent_from" name="sent_from">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sent_to">Sent To</label>
+                            <input type="date" id="sent_to" name="sent_to">
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button type="submit" class="btn btn-primary">Search Records</button>
+                    </div>
+                </form>
+
+                <div class="info-message analytics-empty-state">
+                    Use the filters above and press Search Records to load request records.
                 </div>
             </div>
         </div>
