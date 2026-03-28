@@ -1,12 +1,11 @@
 import httpx
 import secrets
-
 from loguru import logger
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from config import settings
 
@@ -15,22 +14,69 @@ from models.business_user import BusinessUser
 from helpers.dependencies import get_current_user, get_current_business
 
 from helpers.db import get_session
-from helpers.feedback_validation import validate_feedback_token
-from helpers.datetime_formatter import format_datetime_for_business
-from helpers.email_renderer import (
-    render_feedback_email_html,
-    render_admin_feedback_notification_html,
-)
+from helpers.dependencies import get_current_user, get_current_business
+from helpers.email_renderer import render_feedback_email_html
 from helpers.email_sender import send_email_with_resend
 
-from repositories.feedback_requests import (
-    create_feedback_request,
-    respond_to_feedback_request,
-)
-from repositories.businesses import get_business_by_id
+from repositories.feedback_requests import create_feedback_request
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+
+
+@router.get("/", response_class=HTMLResponse)
+async def admin_page(
+    request: Request,
+    status: str | None = None,
+    current_user: BusinessUser = Depends(get_current_user),
+    current_business: Business = Depends(get_current_business),
+):
+    success_message = None
+    error_message = None
+
+    if status == "success":
+        success_message = "Feedback request sent successfully."
+    elif status == "mail_error":
+        error_message = "Email could not be sent. Please check the recipient address or email configuration."
+    elif status == "server_error":
+        error_message = "Unexpected error while sending the email."
+
+    return templates.TemplateResponse(
+        "admin.html",
+        {
+            "request": request,
+            "success_message": success_message,
+            "error_message": error_message,
+            "current_user": current_user,
+            "current_business": current_business,
+        },
+    )
+
+
+@router.get("/preview-email", response_class=HTMLResponse)
+async def preview_email(
+    request: Request,
+    recipientEmail: str = "",
+    identifier: str = "",
+    message: str = "",
+    current_user: BusinessUser = Depends(get_current_user),
+    current_business: Business = Depends(get_current_business),
+):
+    return templates.TemplateResponse(
+        "feedback_email.html",
+        {
+            "request": request,
+            "recipient_email": recipientEmail,
+            "identifier": identifier,
+            "message": message,
+            "default_email_text": current_business.default_email_text,
+            "feedback_url": f"{settings.base_url}/feedback",
+            "current_user": current_user,
+            "current_business": current_business,
+            "business_name": current_business.name,
+            "logo_url": current_business.logo_url,
+        },
+    )
 
 @router.get("/request-feedback")
 async def request_feedback_get():
@@ -120,78 +166,3 @@ async def request_feedback(
     except Exception as exc:
         logger.exception(f"Unexpected error while sending email: {exc}")
         return RedirectResponse(url="/?status=server_error", status_code=303)
-
-
-@router.post("/submit-feedback", response_class=HTMLResponse)
-async def submit_feedback(
-    request: Request,
-    token: str = Form(...),
-    score: int = Form(...),
-    comment: str = Form(""),
-    session: AsyncSession = Depends(get_session),
-):
-    feedback_request, error_response = await validate_feedback_token(
-        request=request,
-        session=session,
-        templates=templates,
-        token=token,
-    )
-
-    if error_response:
-        return error_response
-
-    feedback_request = await respond_to_feedback_request(
-        session=session,
-        feedback_request=feedback_request,
-        score=score,
-        comment=comment,
-    )
-
-    logger.info(
-        f"Feedback submitted | token={token} | score={score} | request_id={feedback_request.id}"
-    )
-
-    business = await get_business_by_id(session, feedback_request.business_id)
-
-    if business and business.reply_to_email:
-        admin_html = render_admin_feedback_notification_html(
-            identifier=feedback_request.identifier,
-            recipient_email=feedback_request.recipient_email,
-            rating=feedback_request.rating,
-            comment=feedback_request.comment,
-            responded_at=format_datetime_for_business(
-                feedback_request.responded_at,
-                business.timezone if business else "UTC",
-            ),
-        )
-
-        try:
-            await send_email_with_resend(
-                resend_api_key=settings.resend_api_key,
-                from_email=business.from_email,
-                to_email=business.reply_to_email,
-                subject=f"New feedback received for {feedback_request.identifier}",
-                html=admin_html,
-                reply_to_email=business.reply_to_email,
-            )
-            logger.info(
-                f"Admin feedback notification sent | token={token} | to={business.reply_to_email}"
-            )
-        except Exception as exc:
-            logger.exception(
-                f"Failed to send admin feedback notification | token={token} | error={exc}"
-            )
-
-    review_url = business.review_redirect_url if business else None
-    show_review_link = bool(review_url) and score >= 8
-
-    return templates.TemplateResponse(
-        "thank_you.html",
-        {
-            "request": request,
-            "title": "Thank you for your feedback",
-            "message": "We appreciate you taking the time to share your experience.",
-            "show_review_link": show_review_link,
-            "review_url": review_url,
-        },
-    )

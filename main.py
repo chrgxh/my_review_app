@@ -13,7 +13,7 @@ from helpers.auth import COOKIE_NAME
 
 from helpers.db import create_db_and_tables
 
-from routes import pages, feedback, auth, analytics
+from routes import auth, analytics, request_feedback, submit_feedback
 
 templates = Jinja2Templates(directory="templates")
 
@@ -65,7 +65,7 @@ async def not_found_handler(request: Request, exc):
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-app.include_router(pages.router)
-app.include_router(feedback.router)
+app.include_router(request_feedback.router)
+app.include_router(submit_feedback.router)
 app.include_router(auth.router)
 app.include_router(analytics.router)
