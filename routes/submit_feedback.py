@@ -19,6 +19,7 @@ from repositories.businesses import get_business_by_id
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
+
 @router.get("/feedback/{token}", response_class=HTMLResponse)
 async def feedback_page(
     request: Request,
@@ -36,6 +37,8 @@ async def feedback_page(
     if error_response:
         return error_response
 
+    business = await get_business_by_id(session, feedback_request.business_id)
+
     logger.info(
         f"Feedback page opened | token={token} | request_id={feedback_request.id}"
     )
@@ -46,8 +49,11 @@ async def feedback_page(
             "request": request,
             "token": token,
             "score": score,
+            "business_name": business.name if business else None,
+            "logo_url": business.logo_url if business else None,
         },
     )
+
 
 @router.post("/submit-feedback", response_class=HTMLResponse)
 async def submit_feedback(
@@ -120,5 +126,7 @@ async def submit_feedback(
             "message": "We appreciate you taking the time to share your experience.",
             "show_review_link": show_review_link,
             "review_url": review_url,
+            "business_name": business.name if business else None,
+            "logo_url": business.logo_url if business else None,
         },
     )

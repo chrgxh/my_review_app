@@ -9,6 +9,16 @@
 <body>
     <div class="auth-page">
         <div class="card feedback-message-card">
+
+            {% if logo_url %}
+                <div class="brand-card-header">
+                    <img
+                        src="{{ logo_url }}"
+                        alt="{{ business_name or 'Logo' }}"
+                    >
+                </div>
+            {% endif %}
+
             <h1>{{ title }}</h1>
 
             <p class="message">{{ message }}</p>
@@ -25,6 +35,13 @@
                     </a>
                 </div>
             {% endif %}
+
+            {% if business_name %}
+                <div class="brand-card-footer">
+                    {{ business_name }}
+                </div>
+            {% endif %}
+
         </div>
     </div>
 </body>

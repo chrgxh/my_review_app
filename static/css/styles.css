@@ -781,3 +781,33 @@ select:focus {
         font-size: 0.84rem;
     }
 }
+
+/* =========================================================
+   Business branding block for public feedback pages
+   ========================================================= */
+
+.brand-card-header {
+    margin: -32px -32px 24px -32px;
+}
+
+.brand-card-header img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+.brand-card-footer {
+    margin-top: 24px;
+    color: #7a8d9a;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .brand-card-header {
+        margin: -24px -24px 20px -24px;
+    }
+}
