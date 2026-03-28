@@ -114,7 +114,7 @@ async def analytics_page(
             "score_distribution": score_distribution,
         }
 
-        analytics_cache.set(analytics_cache_key, summary, ttl_seconds=60)
+        analytics_cache.set(analytics_cache_key, summary, ttl_seconds=60*10)
     else:
         summary = cached_summary
 

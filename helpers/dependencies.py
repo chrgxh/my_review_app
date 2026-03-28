@@ -61,5 +61,5 @@ async def get_current_business(
             detail="Business not found",
         )
 
-    business_cache.set(business_cache_key, business, ttl_seconds=300)
+    business_cache.set(business_cache_key, business, ttl_seconds=3600 * 6)
     return business
