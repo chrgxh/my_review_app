@@ -1,3 +1,4 @@
+import os
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -7,7 +8,9 @@ from models.business_user import BusinessUser
 from models.feedback_request import FeedbackRequest
 from models.password_reset_token import PasswordResetToken
 
-DATABASE_URL = "sqlite+aiosqlite:///app.db"
+os.makedirs("data", exist_ok=True)
+
+DATABASE_URL = "sqlite+aiosqlite:///data/app.db"
 
 engine = create_async_engine(
     DATABASE_URL,
