@@ -5,13 +5,19 @@ __pycache__/
 
 # Virtual environments
 venv/
-.env/
 .venv/
 
 # Environment variables
 .env
 
-# Python packaging
+# Git
+.git
+.gitignore
+
+# Editor files
+.vscode/
+
+# Build artifacts
 build/
 dist/
 *.egg-info/
@@ -19,27 +25,16 @@ dist/
 # Logs
 *.log
 
-# Database / runtime data
+# Database
 data/
 *.db
 *.sqlite3
 
-# VSCode
-.vscode/
-
-# Mac
-.DS_Store
-
-# Linux
-*.swp
-
-# Pytest (if you add tests later)
+# Test and type caches
 .pytest_cache/
-
-# Mypy / type checking
 .mypy_cache/
 
-# Coverage reports
+# Coverage
 htmlcov/
 .coverage
 .coverage.*
@@ -47,4 +42,6 @@ htmlcov/
 # Jupyter
 .ipynb_checkpoints/
 
-static/logos/*
+# OS junk
+.DS_Store
+*.swp
