@@ -45,3 +45,10 @@ htmlcov/
 # OS junk
 .DS_Store
 *.swp
+
+# SSL certificates
+/etc/letsencrypt/
+letsencrypt/
+certs/
+*.pem
+*.key

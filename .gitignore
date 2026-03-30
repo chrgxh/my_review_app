@@ -48,3 +48,10 @@ htmlcov/
 .ipynb_checkpoints/
 
 static/logos/*
+
+# SSL certificates
+/etc/letsencrypt/
+/letsencrypt/
+/certs/
+*.pem
+*.key
