@@ -23,13 +23,12 @@
             background: #f8fbfd;
             border: 1px solid #d6e2ea;
             border-radius: 16px;
-            padding: 32px;
+            overflow: hidden;
             box-shadow: 0 8px 24px rgba(32, 55, 70, 0.08);
         }
 
-        .logo {
-            display: block;
-            margin: 0 auto 20px;
+        .email-card-body {
+            padding: 32px;
         }
 
         h1 {
@@ -105,6 +104,12 @@
             font-size: 13px;
             line-height: 1.5;
         }
+
+        .hero-logo {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -112,47 +117,47 @@
         <div class="email-card">
 
             {% if logo_url %}
-                <div style="margin:-32px -32px 24px -32px;">
-                    <img
-                        src="{{ logo_url }}"
-                        alt="{{ business_name or 'Logo' }}"
-                        style="display:block; width:100%; height:auto; border-top-left-radius:16px; border-top-right-radius:16px;"
-                    >
-                </div>
+                <img
+                    src="{{ logo_url }}"
+                    alt="{{ business_name or 'Logo' }}"
+                    class="hero-logo"
+                >
             {% endif %}
 
-            <h1>We’d love your feedback</h1>
+            <div class="email-card-body">
+                <h1>We’d love your feedback</h1>
 
-            <div class="message-box">{% if message %}{{ message|trim }}{% elif default_email_text %}{{ default_email_text|trim }}{% else %}Thank you for your time. We would really appreciate your feedback.{% endif %}</div>
+                <div class="message-box">{% if message %}{{ message|trim }}{% elif default_email_text %}{{ default_email_text|trim }}{% else %}Thank you for your time. We would really appreciate your feedback.{% endif %}</div>
 
-            <h2 class="rating-title">How was your experience?</h2>
+                <h2 class="rating-title">How was your experience?</h2>
 
-            <div class="score-row">
-                <table role="presentation" class="score-scale" cellpadding="0" cellspacing="0" border="0">
-                    <tr>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=1" class="score-btn">1</a></td>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=2" class="score-btn">2</a></td>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=3" class="score-btn">3</a></td>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=4" class="score-btn">4</a></td>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=5" class="score-btn">5</a></td>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=6" class="score-btn">6</a></td>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=7" class="score-btn">7</a></td>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=8" class="score-btn">8</a></td>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=9" class="score-btn">9</a></td>
-                        <td><a href="{{ feedback_url }}/{{ token }}?score=10" class="score-btn">10</a></td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="footer-note">
-                Click a score to submit your feedback.
-            </div>
-
-            {% if business_name %}
-                <div class="business-name">
-                    {{ business_name }}
+                <div class="score-row">
+                    <table role="presentation" class="score-scale" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=1" class="score-btn">1</a></td>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=2" class="score-btn">2</a></td>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=3" class="score-btn">3</a></td>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=4" class="score-btn">4</a></td>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=5" class="score-btn">5</a></td>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=6" class="score-btn">6</a></td>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=7" class="score-btn">7</a></td>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=8" class="score-btn">8</a></td>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=9" class="score-btn">9</a></td>
+                            <td><a href="{{ feedback_url }}/{{ token }}?score=10" class="score-btn">10</a></td>
+                        </tr>
+                    </table>
                 </div>
-            {% endif %}
+
+                <div class="footer-note">
+                    Click a score to submit your feedback.
+                </div>
+
+                {% if business_name %}
+                    <div class="business-name">
+                        {{ business_name }}
+                    </div>
+                {% endif %}
+            </div>
 
         </div>
     </div>
