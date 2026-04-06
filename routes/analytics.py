@@ -1,37 +1,79 @@
-from datetime import date, datetime, time, UTC
+from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from sqlmodel import select, func
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from helpers.cache import analytics_cache
+from helpers.analytics import (
+    get_analytics_summary,
+    parse_optional_date,
+    parse_optional_int,
+    search_feedback_records,
+)
+from helpers.datetime_formatter import format_datetime_for_business
 from helpers.db import get_session
 from helpers.dependencies import get_current_user, get_current_business
 from models.business import Business
 from models.business_user import BusinessUser
-from models.feedback_request import FeedbackRequest
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-def build_datetime_range(
-    from_date: Optional[date],
-    to_date: Optional[date],
-) -> tuple[Optional[datetime], Optional[datetime]]:
-    from_dt = None
-    to_dt = None
+@router.get("/analytics/records", response_class=HTMLResponse)
+async def analytics_records(
+    request: Request,
+    recipient_email: str = "",
+    identifier: str = "",
+    responded_state: str = "",
+    rating: Optional[str] = None,
+    has_comment: str = "",
+    sent_from: Optional[str] = None,
+    sent_to: Optional[str] = None,
+    page: int = 1,
+    current_user: BusinessUser = Depends(get_current_user),
+    current_business: Business = Depends(get_current_business),
+    session: AsyncSession = Depends(get_session),
+):
+    parsed_rating = parse_optional_int(rating)
+    parsed_sent_from = parse_optional_date(sent_from)
+    parsed_sent_to = parse_optional_date(sent_to)
 
-    if from_date is not None:
-        from_dt = datetime.combine(from_date, time.min).replace(tzinfo=UTC)
+    records_result = await search_feedback_records(
+        session=session,
+        business_id=current_business.id,
+        recipient_email=recipient_email,
+        identifier=identifier,
+        responded_state=responded_state,
+        rating=parsed_rating,
+        has_comment=has_comment,
+        sent_from=parsed_sent_from,
+        sent_to=parsed_sent_to,
+        page=page,
+    )
 
-    if to_date is not None:
-        to_dt = datetime.combine(to_date, time.max).replace(tzinfo=UTC)
-
-    return from_dt, to_dt
+    return templates.TemplateResponse(
+        "analytics_records.html",
+        {
+            "request": request,
+            "current_user": current_user,
+            "current_business": current_business,
+            "records": records_result["records"],
+            "records_total": records_result["records_total"],
+            "page": records_result["page"],
+            "total_pages": records_result["total_pages"],
+            "recipient_email": recipient_email,
+            "identifier": identifier,
+            "responded_state": responded_state,
+            "rating": parsed_rating,
+            "has_comment": has_comment,
+            "sent_from": parsed_sent_from,
+            "sent_to": parsed_sent_to,
+            "format_datetime": format_datetime_for_business,
+        },
+    )
 
 
 @router.get("/analytics", response_class=HTMLResponse)
@@ -43,80 +85,12 @@ async def analytics_page(
     current_business: Business = Depends(get_current_business),
     session: AsyncSession = Depends(get_session),
 ):
-    kpi_from_str = kpi_from.isoformat() if kpi_from else "all"
-    kpi_to_str = kpi_to.isoformat() if kpi_to else "all"
-    analytics_cache_key = f"analytics:{current_business.id}:{kpi_from_str}:{kpi_to_str}"
-
-    cached_summary = analytics_cache.get(analytics_cache_key)
-
-    if cached_summary is None:
-        from_dt, to_dt = build_datetime_range(kpi_from, kpi_to)
-
-        base_conditions = [FeedbackRequest.business_id == current_business.id]
-
-        if from_dt is not None:
-            base_conditions.append(FeedbackRequest.sent_at >= from_dt)
-
-        if to_dt is not None:
-            base_conditions.append(FeedbackRequest.sent_at <= to_dt)
-
-        total_requests_stmt = select(func.count()).where(*base_conditions)
-        total_requests = (await session.exec(total_requests_stmt)).one()
-
-        total_responses_stmt = select(func.count()).where(
-            *base_conditions,
-            FeedbackRequest.responded_at.is_not(None),
-        )
-        total_responses = (await session.exec(total_responses_stmt)).one()
-
-        avg_score_stmt = select(func.avg(FeedbackRequest.rating)).where(
-            *base_conditions,
-            FeedbackRequest.rating.is_not(None),
-        )
-        avg_score = (await session.exec(avg_score_stmt)).one()
-
-        comment_count_stmt = select(func.count()).where(
-            *base_conditions,
-            FeedbackRequest.comment.is_not(None),
-            FeedbackRequest.comment != "",
-        )
-        comment_count = (await session.exec(comment_count_stmt)).one()
-
-        distribution_stmt = (
-            select(FeedbackRequest.rating, func.count())
-            .where(
-                *base_conditions,
-                FeedbackRequest.rating.is_not(None),
-            )
-            .group_by(FeedbackRequest.rating)
-        )
-        distribution_rows = (await session.exec(distribution_stmt)).all()
-
-        score_distribution = {score: 0 for score in range(1, 11)}
-        for rating, count in distribution_rows:
-            if rating in score_distribution:
-                score_distribution[rating] = count
-
-        response_rate = None
-        if total_requests > 0:
-            response_rate = round((total_responses / total_requests) * 100, 2)
-
-        comment_rate = None
-        if total_responses > 0:
-            comment_rate = round((comment_count / total_responses) * 100, 2)
-
-        summary = {
-            "avg_score": round(float(avg_score), 2) if avg_score is not None else None,
-            "response_rate": response_rate,
-            "total_requests": total_requests,
-            "total_responses": total_responses,
-            "comment_rate": comment_rate,
-            "score_distribution": score_distribution,
-        }
-
-        analytics_cache.set(analytics_cache_key, summary, ttl_seconds=60*10)
-    else:
-        summary = cached_summary
+    summary = await get_analytics_summary(
+        session=session,
+        business_id=current_business.id,
+        kpi_from=kpi_from,
+        kpi_to=kpi_to,
+    )
 
     return templates.TemplateResponse(
         "analytics_dashboard.html",

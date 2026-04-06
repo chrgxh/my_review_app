@@ -15,7 +15,19 @@ def format_datetime_for_business(dt: datetime, timezone_name: str | None) -> str
 
     local_dt = dt.astimezone(tz)
 
-    offset_hours = int(local_dt.utcoffset().total_seconds() / 3600)
-    offset_str = f"UTC{offset_hours:+d}"
+    offset = local_dt.utcoffset()
+    if offset is None:
+        offset_str = "UTC+0"
+    else:
+        total_seconds = int(offset.total_seconds())
+        sign = "+" if total_seconds >= 0 else "-"
+        total_seconds = abs(total_seconds)
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+
+        if minutes == 0:
+            offset_str = f"UTC{sign}{hours}"
+        else:
+            offset_str = f"UTC{sign}{hours}:{minutes:02d}"
 
     return local_dt.strftime(f"%d %b %Y, %H:%M (%Z, {offset_str})")

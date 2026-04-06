@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Records</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <div class="content-frame content-frame-wide">
+            <div class="top-tabs">
+                <a href="/" class="tab">Request Feedback</a>
+                <a href="/analytics" class="tab">Analytics</a>
+                <a href="/analytics/records" class="tab active">Records</a>
+                <a href="/business-config" class="tab">Business Config</a>
+            </div>
+
+            <div class="card card-with-tabs">
+                <h1>Request Records</h1>
+                <p class="subtitle">Search and review feedback request records.</p>
+
+                <form method="get" action="/analytics/records" class="analytics-records-form">
+                    <div class="analytics-records-grid">
+                        <div class="form-group">
+                            <label for="recipient_email">Recipient Email</label>
+                            <input
+                                type="text"
+                                id="recipient_email"
+                                name="recipient_email"
+                                placeholder="name@example.com"
+                                value="{{ recipient_email or '' }}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="identifier">Identifier</label>
+                            <input
+                                type="text"
+                                id="identifier"
+                                name="identifier"
+                                placeholder="Search identifier"
+                                value="{{ identifier or '' }}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="responded_state">Responded State</label>
+                            <select id="responded_state" name="responded_state">
+                                <option value="" {% if not responded_state %}selected{% endif %}>All</option>
+                                <option value="responded" {% if responded_state == "responded" %}selected{% endif %}>Responded</option>
+                                <option value="not_responded" {% if responded_state == "not_responded" %}selected{% endif %}>Not Responded</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="rating">Rating</label>
+                            <select id="rating" name="rating">
+                                <option value="" {% if rating is none %}selected{% endif %}>All</option>
+                                {% for score in range(1, 11) %}
+                                    <option value="{{ score }}" {% if rating == score %}selected{% endif %}>{{ score }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="has_comment">Has Comment</label>
+                            <select id="has_comment" name="has_comment">
+                                <option value="" {% if not has_comment %}selected{% endif %}>All</option>
+                                <option value="yes" {% if has_comment == "yes" %}selected{% endif %}>With Comment</option>
+                                <option value="no" {% if has_comment == "no" %}selected{% endif %}>Without Comment</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sent_from">Sent From</label>
+                            <input
+                                type="date"
+                                id="sent_from"
+                                name="sent_from"
+                                value="{{ sent_from.isoformat() if sent_from else '' }}"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sent_to">Sent To</label>
+                            <input
+                                type="date"
+                                id="sent_to"
+                                name="sent_to"
+                                value="{{ sent_to.isoformat() if sent_to else '' }}"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="button-row analytics-records-actions">
+                        <button type="submit" class="btn btn-primary">Search Records</button>
+                        <a href="/analytics/records" class="btn btn-secondary">Clear Filters</a>
+                    </div>
+                </form>
+
+                {% if records_total == 0 %}
+                    <div class="info-message analytics-empty-state">
+                        No request records found.
+                    </div>
+                {% else %}
+                    <div class="analytics-records-meta">
+                        <span>Showing {{ records|length }} of {{ records_total }} records.</span>
+                        <span>Page {{ page }} of {{ total_pages }}</span>
+                    </div>
+
+                    <div class="analytics-records-table-wrapper">
+                        <table class="analytics-records-table">
+                            <thead>
+                                <tr>
+                                    <th>Sent At</th>
+                                    <th>Recipient</th>
+                                    <th>Identifier</th>
+                                    <th>Responded</th>
+                                    <th>Rating</th>
+                                    <th>Comment</th>
+                                    <th>Responded At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in records %}
+                                    <tr>
+                                        <td>
+                                            {{ format_datetime(record.sent_at, current_business.timezone) if record.sent_at else "—" }}
+                                        </td>
+                                        <td class="analytics-cell-email">{{ record.recipient_email }}</td>
+                                        <td class="analytics-cell-identifier">{{ record.identifier }}</td>
+                                        <td>
+                                            {% if record.responded_at %}
+                                                <span class="analytics-status analytics-status-success">Yes</span>
+                                            {% else %}
+                                                <span class="analytics-status analytics-status-muted">No</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if record.rating is not none %}
+                                                <span class="analytics-rating-badge">{{ record.rating }}</span>
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                        <td class="analytics-cell-comment">
+                                            {% if record.comment and record.comment.strip() %}
+                                                {{ record.comment[:100] }}{% if record.comment|length > 100 %}...{% endif %}
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ format_datetime(record.responded_at, current_business.timezone) if record.responded_at else "—" }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if total_pages > 1 %}
+                        <div class="analytics-pagination">
+                            {% if page > 1 %}
+                                <a
+                                    class="btn btn-secondary"
+                                    href="/analytics/records?recipient_email={{ recipient_email or '' }}&identifier={{ identifier or '' }}&responded_state={{ responded_state or '' }}&rating={{ rating if rating is not none else '' }}&has_comment={{ has_comment or '' }}&sent_from={{ sent_from.isoformat() if sent_from else '' }}&sent_to={{ sent_to.isoformat() if sent_to else '' }}&page={{ page - 1 }}"
+                                >
+                                    Previous
+                                </a>
+                            {% else %}
+                                <span class="btn btn-secondary analytics-pagination-disabled">Previous</span>
+                            {% endif %}
+
+                            <span class="analytics-pagination-label">
+                                Page {{ page }} of {{ total_pages }}
+                            </span>
+
+                            {% if page < total_pages %}
+                                <a
+                                    class="btn btn-secondary"
+                                    href="/analytics/records?recipient_email={{ recipient_email or '' }}&identifier={{ identifier or '' }}&responded_state={{ responded_state or '' }}&rating={{ rating if rating is not none else '' }}&has_comment={{ has_comment or '' }}&sent_from={{ sent_from.isoformat() if sent_from else '' }}&sent_to={{ sent_to.isoformat() if sent_to else '' }}&page={{ page + 1 }}"
+                                >
+                                    Next
+                                </a>
+                            {% else %}
+                                <span class="btn btn-secondary analytics-pagination-disabled">Next</span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="utility-actions">
+            <a href="/change-password" class="utility-link">Change Password</a>
+
+            <form method="post" action="/logout">
+                <button type="submit" class="utility-link-button">Log out</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
