@@ -11,6 +11,8 @@ class Business(SQLModel, table=True):
     slug: str = Field(index=True, unique=True)
     from_email: str
     reply_to_email: Optional[str] = None
+    email_subject: Optional[str] = None
+    email_header: Optional[str] = None
     logo_url: Optional[str] = None
     default_email_text: Optional[str] = None
     review_redirect_url: Optional[str] = None

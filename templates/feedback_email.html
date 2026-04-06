@@ -125,7 +125,7 @@
             {% endif %}
 
             <div class="email-card-body">
-                <h1>We’d love your feedback</h1>
+                <h1>{{ email_header or "We’d love your feedback" }}</h1>
 
                 <div class="message-box">{% if message %}{{ message|trim }}{% elif default_email_text %}{{ default_email_text|trim }}{% else %}Thank you for your time. We would really appreciate your feedback.{% endif %}</div>
 

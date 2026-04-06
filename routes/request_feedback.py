@@ -75,6 +75,7 @@ async def preview_email(
             "current_business": current_business,
             "business_name": current_business.name,
             "logo_url": current_business.logo_url,
+            "email_header": current_business.email_header,
         },
     )
 
@@ -111,6 +112,8 @@ async def request_feedback(
     current_business_default_email_text = current_business.default_email_text
     current_business_name = current_business.name
     current_business_logo_url = current_business.logo_url
+    current_business_email_header=current_business.email_header
+    current_business_email_subject=current_business.email_subject
 
     token = secrets.token_urlsafe(24)
     feedback_url = f"{settings.base_url}/feedback"
@@ -130,6 +133,7 @@ async def request_feedback(
         token=token,
         business_name=current_business_name,
         logo_url=current_business_logo_url,
+        email_header=current_business_email_header,
     )
 
     try:
@@ -137,7 +141,7 @@ async def request_feedback(
             resend_api_key=settings.resend_api_key,
             from_email=current_business_from_email,
             to_email=recipientEmail,
-            subject="We’d love your feedback",
+            subject = current_business_email_subject or "We’d love your feedback",
             html=html,
             reply_to_email=current_business_reply_to_email,
         )

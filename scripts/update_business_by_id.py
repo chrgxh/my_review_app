@@ -5,6 +5,8 @@ python -m scripts.update_business_by_id --id 1 --review-redirect-url https://goo
 python -m scripts.update_business_by_id --id 1 --from-email onboarding@resend.dev --reply-to-email example@examplemail.com
 python -m scripts.update_business_by_id --id 2 --name "My Hotel" --slug my-hotel --logo-url https://example.com/logo.png
 python -m scripts.update_business_by_id --id 1 --timezone Europe/Athens
+python -m scripts.update_business_by_id --id 1 --email-subject "We’d love your feedback"
+python -m scripts.update_business_by_id --id 1 --email-header "How was your stay with us?"
 """
 
 import argparse
@@ -30,6 +32,18 @@ def build_parser() -> argparse.ArgumentParser:
         dest="default_email_text",
         type=str,
         help="Default email text",
+    )
+    parser.add_argument(
+        "--email-subject",
+        dest="email_subject",
+        type=str,
+        help="Email subject",
+    )
+    parser.add_argument(
+        "--email-header",
+        dest="email_header",
+        type=str,
+        help="Email header shown inside the email body",
     )
     parser.add_argument(
         "--review-redirect-url",
@@ -83,6 +97,14 @@ async def main():
             business.default_email_text = args.default_email_text
             updated_fields.append("default_email_text")
 
+        if args.email_subject is not None:
+            business.email_subject = args.email_subject
+            updated_fields.append("email_subject")
+
+        if args.email_header is not None:
+            business.email_header = args.email_header
+            updated_fields.append("email_header")
+
         if args.review_redirect_url is not None:
             business.review_redirect_url = args.review_redirect_url
             updated_fields.append("review_redirect_url")
@@ -107,6 +129,8 @@ async def main():
         print(f"reply_to_email={business.reply_to_email}")
         print(f"logo_url={business.logo_url}")
         print(f"default_email_text={business.default_email_text}")
+        print(f"email_subject={business.email_subject}")
+        print(f"email_header={business.email_header}")
         print(f"review_redirect_url={business.review_redirect_url}")
         print(f"timezone={business.timezone}")
         print(f"updated_fields={', '.join(updated_fields)}")
