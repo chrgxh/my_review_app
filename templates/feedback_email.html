@@ -1,165 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>We’d love your feedback</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 32px 16px;
-            background: #e9eff4;
-            font-family: Arial, sans-serif;
-            color: #1f2a37;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>We'd love your feedback</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 32px 16px;
+      background: #e9eff4;
+      font-family: Arial, sans-serif;
+      color: #1f2a37;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
 
-        .email-wrapper {
-            max-width: 680px;
-            margin: 0 auto;
-            text-align: center;
-        }
+    table {
+      border-collapse: collapse;
+      mso-table-lspace: 0;
+      mso-table-rspace: 0;
+    }
 
-        .email-card {
-            background: #f8fbfd;
-            border: 1px solid #d6e2ea;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 8px 24px rgba(32, 55, 70, 0.08);
-        }
+    td {
+      padding: 0;
+    }
 
-        .email-card-body {
-            padding: 32px;
-        }
+    img {
+      border: 0;
+      outline: none;
+      text-decoration: none;
+      -ms-interpolation-mode: bicubic;
+    }
 
-        h1 {
-            margin: 0 0 16px;
-            font-size: 26px;
-            color: #183142;
-        }
+    .email-wrapper {
+      max-width: 680px;
+      margin: 0 auto;
+      text-align: center;
+    }
 
-        .message-box {
-            margin: 0 auto 28px;
-            padding: 18px;
-            background: #ffffff;
-            border: 1px solid #dbe5ec;
-            border-radius: 12px;
-            max-width: 520px;
-            text-align: left;
-            white-space: pre-wrap;
-            line-height: 1.6;
-        }
+    .email-card {
+      background: #f8fbfd;
+      border: 1px solid #d6e2ea;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(32, 55, 70, 0.08);
+    }
 
-        .rating-title {
-            margin: 0 0 16px;
-            font-size: 18px;
-            color: #27485a;
-        }
+    .email-card-body {
+      padding: 32px 24px;
+    }
 
-        .score-row {
-            margin: 0 auto 22px;
-            max-width: 520px;
-        }
+    h1 {
+      margin: 0 0 16px;
+      font-size: 26px;
+      line-height: 1.25;
+      color: #183142;
+    }
 
-        .score-scale {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            table-layout: fixed;
-            background: #edf4f8;
-            border: 1px solid #cddbe5;
-            border-radius: 10px;
-            overflow: hidden;
-        }
+    .message-box {
+      margin: 0 auto 28px;
+      padding: 18px;
+      background: #ffffff;
+      border: 1px solid #dbe5ec;
+      border-radius: 12px;
+      max-width: 520px;
+      text-align: left;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      line-height: 1.6;
+    }
 
-        .score-scale td {
-            padding: 0;
-        }
+    .rating-title {
+      margin: 0 0 20px;
+      font-size: 18px;
+      line-height: 1.4;
+      color: #27485a;
+    }
 
-        .score-btn {
-            display: block;
-            width: 100%;
-            padding: 12px 0;
-            text-align: center;
-            text-decoration: none;
-            background: #edf4f8;
-            color: #2c4d63;
-            font-weight: 700;
-            font-size: 15px;
-            line-height: 1;
-        }
+    .score-row {
+      margin: 0 auto 16px;
+      max-width: 560px;
+    }
 
-        .score-scale td + td .score-btn {
-            border-left: 1px solid #dbe5ec;
-        }
+    .score-scale {
+      width: 100%;
+      table-layout: fixed;
+    }
 
-        .footer-note {
-            color: #7a8d9a;
-            font-size: 13px;
-            line-height: 1.5;
-        }
+    .score-scale td {
+      width: 10%;
+      padding: 0 3px;
+    }
 
-        .business-name {
-            margin-top: 10px;
-            color: #7a8d9a;
-            font-size: 13px;
-            line-height: 1.5;
-        }
+    .score-btn {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 2px;
+      text-align: center;
+      text-decoration: none;
+      background: #f8fbfd;
+      border: 1px solid #b3c2cd;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
 
-        .hero-logo {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
-    </style>
+    .score-btn-inner {
+      display: block;
+      padding: 10px 0;
+      color: #274a61;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1;
+      border: 1px solid #d6e1e8;
+      border-radius: 7px;
+      background: #f8fbfd;
+    }
+
+    .divider-wrap {
+      margin: 20px 0 22px;
+    }
+
+    .divider-table {
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    .divider-side {
+      vertical-align: middle;
+    }
+
+    .divider-line {
+      height: 1px;
+      background: #d4dee7;
+      font-size: 0;
+      line-height: 0;
+    }
+
+    .divider-center {
+      width: 30px;
+      text-align: center;
+      vertical-align: middle;
+      color: #b8c8d4;
+      font-size: 14px;
+      line-height: 1;
+      font-family: Arial, sans-serif;
+    }
+
+    .footer-note {
+      color: #7a8d9a;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .business-name {
+      margin-top: 10px;
+      color: #7a8d9a;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .hero-logo {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  </style>
 </head>
 <body>
-    <div class="email-wrapper">
-        <div class="email-card">
+  <div class="email-wrapper">
+    <div class="email-card">
 
-            {% if logo_url %}
-                <img
-                    src="{{ logo_url }}"
-                    alt="{{ business_name or 'Logo' }}"
-                    class="hero-logo"
-                >
-            {% endif %}
+      {% if logo_url %}
+      <img src="{{ logo_url }}" alt="{{ business_name or 'Logo' }}" class="hero-logo">
+      {% endif %}
 
-            <div class="email-card-body">
-                <h1>{{ email_header or "We’d love your feedback" }}</h1>
+      <div class="email-card-body">
+        <h1>{{ email_header or "We'd love your feedback" }}</h1>
 
-                <div class="message-box">{% if message %}{{ message|trim }}{% elif default_email_text %}{{ default_email_text|trim }}{% else %}Thank you for your time. We would really appreciate your feedback.{% endif %}</div>
+        <div class="message-box">{% if message %}{{ message|trim }}{% elif default_email_text %}{{ default_email_text|trim }}{% else %}Thank you for your time. We would love to hear your feedback.{% endif %}</div>
 
-                <h2 class="rating-title">Please take a moment to rate your experience.</h2>
+        <h2 class="rating-title">Please take a moment to rate your experience.</h2>
 
-                <div class="score-row">
-                    <table role="presentation" class="score-scale" cellpadding="0" cellspacing="0" border="0">
-                        <tr>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=1" class="score-btn">1</a></td>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=2" class="score-btn">2</a></td>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=3" class="score-btn">3</a></td>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=4" class="score-btn">4</a></td>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=5" class="score-btn">5</a></td>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=6" class="score-btn">6</a></td>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=7" class="score-btn">7</a></td>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=8" class="score-btn">8</a></td>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=9" class="score-btn">9</a></td>
-                            <td><a href="{{ feedback_url }}/{{ token }}?score=10" class="score-btn">10</a></td>
-                        </tr>
-                    </table>
-                </div>
+        <div class="score-row">
+          <table role="presentation" class="score-scale" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=1" class="score-btn"><span class="score-btn-inner">1</span></a></td>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=2" class="score-btn"><span class="score-btn-inner">2</span></a></td>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=3" class="score-btn"><span class="score-btn-inner">3</span></a></td>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=4" class="score-btn"><span class="score-btn-inner">4</span></a></td>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=5" class="score-btn"><span class="score-btn-inner">5</span></a></td>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=6" class="score-btn"><span class="score-btn-inner">6</span></a></td>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=7" class="score-btn"><span class="score-btn-inner">7</span></a></td>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=8" class="score-btn"><span class="score-btn-inner">8</span></a></td>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=9" class="score-btn"><span class="score-btn-inner">9</span></a></td>
+              <td><a href="{{ feedback_url }}/{{ token }}?score=10" class="score-btn"><span class="score-btn-inner">10</span></a></td>
+            </tr>
+          </table>
 
-                <div class="footer-note">
-                    Click a score to submit your feedback.
-                </div>
-
-                {% if business_name %}
-                    <div class="business-name">
-                        {{ business_name }}
-                    </div>
-                {% endif %}
-            </div>
-
+          <div class="divider-wrap">
+            <table role="presentation" class="divider-table" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td class="divider-side">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td class="divider-line" height="1"></td>
+                    </tr>
+                  </table>
+                </td>
+                <td class="divider-center">&loz;</td>
+                <td class="divider-side">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td class="divider-line" height="1"></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
+
+        <div class="footer-note">
+          Click a score to submit your feedback.
+        </div>
+
+        {% if business_name %}
+        <div class="business-name">
+          {{ business_name }}
+        </div>
+        {% endif %}
+
+      </div>
     </div>
+  </div>
 </body>
 </html>
