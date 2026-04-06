@@ -843,3 +843,7 @@ select:focus {
     font-size: 0.9rem;
     line-height: 1.5;
 }
+
+.input-help-warning {
+    color: #7a5a2e;
+}
