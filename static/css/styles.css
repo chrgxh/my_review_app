@@ -811,3 +811,35 @@ select:focus {
         margin: -24px -24px 20px -24px;
     }
 }
+
+/* =========================================================
+   Business config
+   ========================================================= */
+
+.business-config-logo-preview {
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #d6e2ea;
+    border-radius: 12px;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.business-config-logo-preview img {
+    display: block;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    max-height: 220px;
+    object-fit: contain;
+}
+
+.input-help {
+    margin-top: 8px;
+    color: #5f7383;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}

@@ -13,7 +13,7 @@ from helpers.auth import COOKIE_NAME
 
 from helpers.db import create_db_and_tables
 
-from routes import auth, analytics, request_feedback, submit_feedback
+from routes import auth, analytics, request_feedback, submit_feedback, business_config
 
 templates = Jinja2Templates(directory="templates")
 
@@ -69,3 +69,4 @@ app.include_router(request_feedback.router)
 app.include_router(submit_feedback.router)
 app.include_router(auth.router)
 app.include_router(analytics.router)
+app.include_router(business_config.router)

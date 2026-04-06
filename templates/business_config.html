@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Config</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <div class="content-frame">
+            <div class="top-tabs">
+                <a href="/" class="tab">Request Feedback</a>
+                <a href="/analytics" class="tab">Analytics</a>
+                <a href="/business-config" class="tab active">Business Config</a>
+            </div>
+
+            <div class="card card-with-tabs">
+                <h1>Business Config</h1>
+                <p class="subtitle">Manage your business email and branding settings.</p>
+
+                {% if success_message %}
+                    <div class="success-message">{{ success_message }}</div>
+                {% endif %}
+                {% if error_message %}
+                    <div class="error-message">{{ error_message }}</div>
+                {% endif %}
+
+                <form action="/business-config" method="post" enctype="multipart/form-data">
+
+                    <div class="form-group">
+                        <label for="name">Business name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value="{{ current_business.name or '' }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="slug">Email name</label>
+                        <input
+                            type="text"
+                            id="slug"
+                            name="slug"
+                            value="{{ current_business.slug or '' }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reply_to_email">Reply-to email</label>
+                        <input
+                            type="email"
+                            id="reply_to_email"
+                            name="reply_to_email"
+                            value="{{ current_business.reply_to_email or '' }}"
+                            placeholder="Optional"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email_subject">Email subject</label>
+                        <input
+                            type="text"
+                            id="email_subject"
+                            name="email_subject"
+                            value="{{ current_business.email_subject or '' }}"
+                            placeholder="We’d love your feedback"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email_header">Email header</label>
+                        <input
+                            type="text"
+                            id="email_header"
+                            name="email_header"
+                            value="{{ current_business.email_header or '' }}"
+                            placeholder="We’d love your feedback"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="default_email_text">Default email text</label>
+                        <textarea
+                            id="default_email_text"
+                            name="default_email_text"
+                            rows="6"
+                            placeholder="Default message shown in the feedback email..."
+                        >{{ current_business.default_email_text or '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="review_redirect_url">Review redirect URL</label>
+                        <input
+                            type="url"
+                            id="review_redirect_url"
+                            name="review_redirect_url"
+                            value="{{ current_business.review_redirect_url or '' }}"
+                            placeholder="https://example.com/review-page"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timezone">Timezone</label>
+                        <select id="timezone" name="timezone" required>
+                            {% for tz in timezone_options %}
+                                <option
+                                    value="{{ tz['value'] }}"
+                                    {% if (current_business.timezone or 'UTC') == tz['value'] %}selected{% endif %}
+                                >
+                                    {{ tz['label'] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="logo">Logo</label>
+                        <input
+                            type="file"
+                            id="logo"
+                            name="logo"
+                            accept="image/png"
+                        >
+                        <div class="input-help">
+                            Upload a .png logo. A wide horizontal banner works best.
+                        </div>
+                    </div>
+
+                    {% if current_business.logo_url %}
+                        <div class="form-group">
+                            <label>Current logo</label>
+                            <div class="business-config-logo-preview">
+                                <img src="{{ current_business.logo_url }}" alt="{{ current_business.name }}">
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="button-row">
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="utility-actions">
+            <a href="/change-password" class="utility-link">Change Password</a>
+
+            <form method="post" action="/logout">
+                <button type="submit" class="utility-link-button">Log out</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
