@@ -116,7 +116,7 @@ async def submit_feedback(
             )
 
     review_url = business.review_redirect_url if business else None
-    show_review_link = bool(review_url) and score >= 8
+    show_review_link = bool(review_url)
 
     return templates.TemplateResponse(
         "thank_you.html",
