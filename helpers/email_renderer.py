@@ -6,6 +6,18 @@ jinja_env = Environment(
 )
 
 
+def _is_modern_email_client(email: str) -> bool:
+    """Check if email domain supports modern CSS."""
+    domain = email.lower().split("@")[-1]
+    modern_domains = {
+        "gmail.com",
+        # "googlemail.com",
+        # "yahoo.com",
+        # "aol.com",
+    }
+    return domain in modern_domains
+
+
 def render_feedback_email_html(
     recipient_email: str,
     identifier: str,
@@ -17,7 +29,11 @@ def render_feedback_email_html(
     default_email_text: str | None = None,
     email_header: str | None = None,
 ) -> str:
-    template = jinja_env.get_template("feedback_email.html")
+    # Choose template based on email client
+    is_modern = _is_modern_email_client(recipient_email)
+    template_name = "feedback_email.html" if is_modern else "safe_feedback_email.html"
+    
+    template = jinja_env.get_template(template_name)
 
     html = template.render(
         recipient_email=recipient_email,
@@ -32,6 +48,7 @@ def render_feedback_email_html(
     )
 
     return html
+
 
 def render_admin_feedback_notification_html(
     identifier: str,
@@ -51,6 +68,7 @@ def render_admin_feedback_notification_html(
     )
 
     return html
+
 
 def render_password_reset_email_html(reset_link: str) -> str:
     template = jinja_env.get_template("password_reset_email.html")
