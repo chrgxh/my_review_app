@@ -46,10 +46,10 @@ async def get_current_business(
     session: AsyncSession = Depends(get_session),
 ) -> Business:
     business_cache_key = f"business:{current_user.business_id}"
-    cached_business = business_cache.get(business_cache_key)
 
-    if cached_business is not None:
-        return cached_business
+    cached = business_cache.get(business_cache_key)
+    if cached is not None:
+        return Business(**cached)
 
     statement = select(Business).where(Business.id == current_user.business_id)
     result = await session.exec(statement)
@@ -61,5 +61,25 @@ async def get_current_business(
             detail="Business not found",
         )
 
-    business_cache.set(business_cache_key, business, ttl_seconds=3600 * 6)
+    # ✅ store only plain data
+    business_cache.set(
+        business_cache_key,
+        {
+            "id": business.id,
+            "name": business.name,
+            "slug": business.slug,
+            "from_email": business.from_email,
+            "reply_to_email": business.reply_to_email,
+            "email_subject": business.email_subject,
+            "email_header": business.email_header,
+            "logo_url": business.logo_url,
+            "default_email_text": business.default_email_text,
+            "review_redirect_url": business.review_redirect_url,
+            "timezone": business.timezone,
+            "subscription_end": business.subscription_end,
+            "created_at": business.created_at,
+        },
+        ttl_seconds=3600 * 6,
+    )
+
     return business
