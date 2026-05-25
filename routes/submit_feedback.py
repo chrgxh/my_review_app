@@ -12,6 +12,8 @@ from helpers.feedback_validation import validate_feedback_token
 from helpers.datetime_formatter import format_datetime_for_business
 from helpers.email_renderer import render_admin_feedback_notification_html
 from helpers.email_sender import send_email_with_resend
+from helpers.rate_limit import limiter
+from helpers.request import get_client_ip, mask_token
 
 from repositories.feedback_requests import respond_to_feedback_request
 from repositories.businesses import get_business_by_id
@@ -21,12 +23,19 @@ templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/feedback/{token}", response_class=HTMLResponse)
+@limiter.limit("30/minute")
 async def feedback_page(
     request: Request,
     token: str,
     score: int = Query(..., ge=1, le=10),
     session: AsyncSession = Depends(get_session),
 ):
+    client_ip = get_client_ip(request)
+    logger.info(
+        f"Feedback form opened | action=feedback_page | client_ip={client_ip} "
+        f"| token={mask_token(token)}"
+    )
+
     feedback_request, error_response = await validate_feedback_token(
         request=request,
         session=session,
@@ -40,7 +49,10 @@ async def feedback_page(
     business = await get_business_by_id(session, feedback_request.business_id)
 
     logger.info(
-        f"Feedback page opened | token={token} | request_id={feedback_request.id}"
+        f"Feedback form loaded | action=feedback_page | client_ip={client_ip} "
+        f"| token={mask_token(token)} | request_id={feedback_request.id} "
+        f"| business_id={feedback_request.business_id} "
+        f"| identifier={feedback_request.identifier}"
     )
 
     return templates.TemplateResponse(
@@ -56,6 +68,7 @@ async def feedback_page(
 
 
 @router.post("/submit-feedback", response_class=HTMLResponse)
+@limiter.limit("10/minute")
 async def submit_feedback(
     request: Request,
     token: str = Form(...),
@@ -63,6 +76,12 @@ async def submit_feedback(
     comment: str = Form(""),
     session: AsyncSession = Depends(get_session),
 ):
+    client_ip = get_client_ip(request)
+    logger.info(
+        f"Feedback submission attempted | action=submit_feedback | client_ip={client_ip} "
+        f"| token={mask_token(token)} | score={score}"
+    )
+
     feedback_request, error_response = await validate_feedback_token(
         request=request,
         session=session,
@@ -81,7 +100,9 @@ async def submit_feedback(
     )
 
     logger.info(
-        f"Feedback submitted | token={token} | score={score} | request_id={feedback_request.id}"
+        f"Feedback submission success | action=submit_feedback | client_ip={client_ip} "
+        f"| token={mask_token(token)} | score={score} | request_id={feedback_request.id} "
+        f"| business_id={feedback_request.business_id}"
     )
 
     business = await get_business_by_id(session, feedback_request.business_id)
@@ -108,11 +129,13 @@ async def submit_feedback(
                 reply_to_email=business.reply_to_email,
             )
             logger.info(
-                f"Admin feedback notification sent | token={token} | to={business.reply_to_email}"
+                f"Admin feedback notification sent | token={mask_token(token)} "
+                f"| to={business.reply_to_email}"
             )
         except Exception as exc:
             logger.exception(
-                f"Failed to send admin feedback notification | token={token} | error={exc}"
+                f"Failed to send admin feedback notification | token={mask_token(token)} "
+                f"| error={exc}"
             )
 
     review_url = business.review_redirect_url if business else None

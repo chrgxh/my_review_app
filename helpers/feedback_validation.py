@@ -6,6 +6,8 @@ from loguru import logger
 from repositories.feedback_requests import get_feedback_request_by_token
 from repositories.businesses import get_business_by_id
 
+from helpers.request import mask_token
+
 
 async def validate_feedback_token(
     request: Request,
@@ -19,7 +21,7 @@ async def validate_feedback_token(
     )
 
     if feedback_request is None:
-        logger.warning(f"Invalid feedback token attempted: {token}")
+        logger.warning(f"Invalid feedback token attempted: {mask_token(token)}")
         return None, templates.TemplateResponse(
             "thank_you.html",
             {
@@ -36,7 +38,7 @@ async def validate_feedback_token(
 
     if feedback_request.responded_at is not None:
         logger.warning(
-            f"Duplicate feedback submission attempted | token={token} | request_id={feedback_request.id}"
+            f"Duplicate feedback submission attempted | token={mask_token(token)} | request_id={feedback_request.id}"
         )
 
         business = await get_business_by_id(session, feedback_request.business_id)

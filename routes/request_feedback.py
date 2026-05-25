@@ -17,6 +17,8 @@ from helpers.db import get_session
 from helpers.dependencies import get_current_user, get_current_business
 from helpers.email_renderer import render_feedback_email_html
 from helpers.email_sender import send_email_with_resend
+from helpers.rate_limit import limiter
+from helpers.request import get_client_ip, mask_token
 
 from repositories.feedback_requests import create_feedback_request
 
@@ -84,6 +86,7 @@ async def request_feedback_get():
     return RedirectResponse(url="/", status_code=303)
 
 @router.post("/request-feedback", response_class=HTMLResponse)
+@limiter.limit("10/minute")
 async def request_feedback(
     request: Request,
     recipientEmail: str = Form(...),
@@ -93,7 +96,13 @@ async def request_feedback(
     current_user: BusinessUser = Depends(get_current_user),
     current_business: Business = Depends(get_current_business),
 ):
-    logger.info(f"Preparing feedback request for {recipientEmail}")
+    client_ip = get_client_ip(request)
+    logger.info(
+        f"Request-feedback attempt received | action=request_feedback "
+        f"| client_ip={client_ip} | recipient_email={recipientEmail} "
+        f"| identifier={identifier} | business_id={current_business.id} "
+        f"| user_id={current_user.id}"
+    )
 
     if current_user.id is None or current_business.id is None:
         return templates.TemplateResponse(
@@ -158,7 +167,10 @@ async def request_feedback(
         )
 
         logger.info(
-            f"Feedback email sent | recipient={recipientEmail} | identifier={identifier} | token={token} | business_id={current_business_id} | user_id={current_user_id}"
+            f"Feedback email sent | action=request_feedback | client_ip={client_ip} "
+            f"| recipient_email={recipientEmail} | identifier={identifier} "
+            f"| token={mask_token(token)} | business_id={current_business_id} "
+            f"| user_id={current_user_id}"
         )
 
         return RedirectResponse(url="/?status=success", status_code=303)

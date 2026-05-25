@@ -15,6 +15,7 @@ from helpers.analytics import (
 from helpers.datetime_formatter import format_datetime_for_business
 from helpers.db import get_session
 from helpers.dependencies import get_current_user, get_current_business
+from helpers.rate_limit import limiter
 from models.business import Business
 from models.business_user import BusinessUser
 
@@ -23,6 +24,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/analytics/records", response_class=HTMLResponse)
+@limiter.limit("60/minute")
 async def analytics_records(
     request: Request,
     recipient_email: str = "",

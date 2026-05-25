@@ -8,8 +8,12 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+
 from config import settings
 from helpers.auth import COOKIE_NAME
+from helpers.rate_limit import limiter, rate_limit_exceeded_handler
 
 from helpers.db import create_db_and_tables
 
@@ -27,6 +31,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+# --- Rate limiting (slowapi) ---
+# Register the limiter, its 429 handler, and the middleware that enforces
+# the @limiter.limit(...) decorators declared on individual routes.
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 
 @app.exception_handler(HTTPException)

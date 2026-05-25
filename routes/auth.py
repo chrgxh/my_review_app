@@ -1,3 +1,5 @@
+from loguru import logger
+
 from fastapi import APIRouter, Depends, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -6,6 +8,9 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 
 from config import settings
+
+from helpers.rate_limit import limiter
+from helpers.request import get_client_ip, mask_token
 
 from helpers.email_renderer import render_password_reset_email_html
 from helpers.email_sender import send_email_with_resend
@@ -69,6 +74,7 @@ async def login_page(
 
 
 @router.post("/login")
+@limiter.limit("5/minute")
 async def login(
     request: Request,
     email: str = Form(...),
@@ -76,45 +82,61 @@ async def login(
     session: AsyncSession = Depends(get_session),
     current_user: BusinessUser | None = Depends(get_current_user_optional),
 ):
+    client_ip = get_client_ip(request)
+    logger.info(
+        f"Login attempt started | action=login | client_ip={client_ip} | email={email}"
+    )
+
     if current_user is not None:
         return RedirectResponse(
             url="/login",
             status_code=status.HTTP_303_SEE_OTHER,
         )
 
+    def login_error_response():
+        response = RedirectResponse(
+            url="/login",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+        response.set_cookie(
+            key=LOGIN_ERROR_COOKIE,
+            value="1",
+            max_age=FLASH_COOKIE_MAX_AGE,
+            httponly=True,
+            samesite="lax",
+            secure=False,
+        )
+        return response
+
     user = await get_business_user_by_email(session, email)
 
-    if user is None or not user.is_active or not verify_password(password, user.password_hash):
-        response = RedirectResponse(
-            url="/login",
-            status_code=status.HTTP_303_SEE_OTHER,
+    if user is None or not user.is_active:
+        logger.warning(
+            f"Login failed: user does not exist or is inactive | action=login "
+            f"| client_ip={client_ip} | email={email}"
         )
-        response.set_cookie(
-            key=LOGIN_ERROR_COOKIE,
-            value="1",
-            max_age=FLASH_COOKIE_MAX_AGE,
-            httponly=True,
-            samesite="lax",
-            secure=False,
+        return login_error_response()
+
+    if not verify_password(password, user.password_hash):
+        logger.warning(
+            f"Login failed: wrong password | action=login | client_ip={client_ip} "
+            f"| email={email} | user_id={user.id} | business_id={user.business_id}"
         )
-        return response
+        return login_error_response()
 
     if user.id is None:
-        response = RedirectResponse(
-            url="/login",
-            status_code=status.HTTP_303_SEE_OTHER,
+        logger.warning(
+            f"Login failed: user has no id | action=login | client_ip={client_ip} "
+            f"| email={email}"
         )
-        response.set_cookie(
-            key=LOGIN_ERROR_COOKIE,
-            value="1",
-            max_age=FLASH_COOKIE_MAX_AGE,
-            httponly=True,
-            samesite="lax",
-            secure=False,
-        )
-        return response
+        return login_error_response()
 
     token = create_session_token(user.id)
+
+    logger.info(
+        f"Login success | action=login | client_ip={client_ip} | email={email} "
+        f"| user_id={user.id} | business_id={user.business_id}"
+    )
 
     response = RedirectResponse(
         url="/",
@@ -225,15 +247,29 @@ async def forgot_password_page(request: Request):
 
 
 @router.post("/forgot-password")
+@limiter.limit("3/hour")
 async def forgot_password(
+    request: Request,
     email: str = Form(...),
     session: AsyncSession = Depends(get_session),
 ):
+    client_ip = get_client_ip(request)
+    logger.info(
+        f"Forgot-password request received | action=forgot_password "
+        f"| client_ip={client_ip} | email={email}"
+    )
+
     user = await get_business_user_by_email(session, email)
 
     if user is not None and user.is_active and user.id is not None:
         user_id = user.id
         user_email = user.email
+
+        logger.info(
+            f"Forgot-password reset email queued | action=forgot_password "
+            f"| client_ip={client_ip} | email={email} | user_id={user_id} "
+            f"| business_id={user.business_id}"
+        )
 
         raw_token = generate_raw_reset_token()
         token_hash = hash_reset_token(raw_token)
@@ -299,15 +335,27 @@ async def reset_password_page(
     return response
 
 @router.post("/reset-password")
+@limiter.limit("5/minute")
 async def reset_password(
+    request: Request,
     token: str = Form(...),
     new_password: str = Form(...),
     session: AsyncSession = Depends(get_session),
 ):
+    client_ip = get_client_ip(request)
+    logger.info(
+        f"Reset-password attempt received | action=reset_password "
+        f"| client_ip={client_ip} | token={mask_token(token)}"
+    )
+
     token_hash = hash_reset_token(token)
 
     reset_token = await get_valid_password_reset_token(session, token_hash)
     if reset_token is None:
+        logger.warning(
+            f"Reset-password failed: invalid or expired token | action=reset_password "
+            f"| client_ip={client_ip} | token={mask_token(token)}"
+        )
         response = RedirectResponse(
             url="/reset-password",
             status_code=status.HTTP_303_SEE_OTHER,
@@ -347,6 +395,11 @@ async def reset_password(
     await session.commit()
 
     await mark_password_reset_token_used(session, reset_token)
+
+    logger.info(
+        f"Reset-password success | action=reset_password | client_ip={client_ip} "
+        f"| token={mask_token(token)} | user_id={user.id} | business_id={user.business_id}"
+    )
 
     response = RedirectResponse(
         url="/login",
