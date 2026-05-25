@@ -60,10 +60,30 @@ For TLS certificate setup, see [HTTPS_SETUP.md](HTTPS_SETUP.md).
 
 ## Rate limiting
 
+Protection runs in two layers:
+
+### 1. Nginx (global, per IP)
+
+`nginx.conf` applies coarse, app-wide limits to every request before it reaches
+FastAPI:
+
+- `limit_req` — 10 req/s per client IP, with a burst of 30 (`nodelay`).
+- `limit_conn` — max 20 concurrent connections per client IP.
+
+These are deliberately broad; fine-grained, route-specific limits live in the
+app (below). Limits key on `$binary_remote_addr`, which is the real client only
+while Nginx is the edge — revisit the zones if you ever put Cloudflare or
+another proxy in front. By default Nginx returns `503` when a limit trips; add
+`limit_req_status 429;` / `limit_conn_status 429;` to make it `429`.
+
+### 2. FastAPI / SlowAPI (per route, per IP)
+
 Per-IP limits are enforced with [slowapi](https://github.com/laurentS/slowapi).
-The client IP is taken from the `X-Forwarded-For` header set by NGINX (falling
-back to the socket address), so the NGINX proxy headers in `nginx.conf` are
-required for limits to key on the real visitor.
+The client IP is resolved in `helpers/request.py` as `X-Real-IP` → last entry of
+`X-Forwarded-For` → socket address. We avoid the *first* `X-Forwarded-For` entry
+on purpose: Nginx appends rather than strips it, so the first entry is
+client-supplied and would let an attacker bypass per-IP limits. The proxy
+headers in `nginx.conf` are required for limits to key on the real visitor.
 
 | Endpoint                  | Limit       |
 | ------------------------- | ----------- |
